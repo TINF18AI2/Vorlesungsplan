@@ -13,9 +13,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.logging.Logger
 
-class VorlesungsplanAnalyser(val applicationContext : Context, val mainRecyclerView: RecyclerView, val fab : FloatingActionButton){
+class VorlesungsplanAnalyser{
 
-    private lateinit var adapter: VorlesungsplanAdapter
 
     private var URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
@@ -24,30 +23,15 @@ class VorlesungsplanAnalyser(val applicationContext : Context, val mainRecyclerV
     var wek: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     var log: Logger = Logger.getGlobal()
     var wait: Boolean = true
-    fun analyse(){
+    fun analyse() : List<Vorlesungstag>{
 
         val t = DemoThread()
         t.start()
         while (wait) {
         }
+        t.interrupt()
         log.info("Out")
-
-        var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
-
-        for (day in wek) {
-            for (item in day.items) {
-                allItems.add(item)
-            }
-        }
-        log.info("wek: " + wek.toString())
-        log.info("allItems: " + allItems.toString())
-        adapter = VorlesungsplanAdapter(items = allItems, context = applicationContext)
-        mainRecyclerView.adapter = adapter
-
-        //fab.setOnClickListener { v: View? ->
-        //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
-        //    startActivity(browserIntent)
-        //}
+        return wek
     }
     internal inner class DemoThread : Thread() {
 
@@ -67,9 +51,10 @@ class VorlesungsplanAnalyser(val applicationContext : Context, val mainRecyclerV
                 .children()//Array which holds information about every day in the week
 
             for (day in days) {
-                log.info("\n\nTest: " + day.toString())
+                log.info("\n\nDay: " + day.toString())
                 val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
-                for (elem in day.getElementsByClass("ui-li ui-li-static ui-body-b")) {
+                for (elem in day.select("li[class=ui-li-static]")) {
+                    log.info("\n\nItem: " + elem.toString())
                     items.add(
                         VorlesungsplanItem(
                             elem.getElementsByClass("cal-title").first().text(),

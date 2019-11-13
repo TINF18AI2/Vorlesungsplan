@@ -20,14 +20,32 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 class MainActivity : AppCompatActivity() {
 
+    var log: Logger = Logger.getGlobal()
+    private lateinit var adapter: VorlesungsplanAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
-        VorlesungsplanAnalyser(applicationContext,mainRecyclerView,fab).analyse()
+        var week = VorlesungsplanAnalyser().analyse()
+        var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
 
+        for (day in week) {
+            for (item in day.items) {
+                allItems.add(item)
+            }
+        }
+        log.info("wek: " + week.toString())
+        log.info("allItems: " + allItems.toString())
+        adapter = VorlesungsplanAdapter(items = allItems, context = applicationContext)
+        mainRecyclerView.adapter = adapter
+
+        //fab.setOnClickListener { v: View? ->
+        //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
+        //    startActivity(browserIntent)
+        //}
     }
 
 
