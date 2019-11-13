@@ -15,7 +15,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: VorlesungsplanAdapter
 
+
+    var wek : List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     var log: Logger = Logger.getGlobal()
+    var wait : Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +26,14 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
-        DemoThread().start()
+        val t = DemoThread()
+        t.start()
+        while (wait){
+        }
+        log.info("Out")
+        adapter = VorlesungsplanAdapter(items = wek, context = applicationContext)
+        mainRecyclerView.adapter = adapter
+
     }
 
 
@@ -31,14 +41,11 @@ class MainActivity : AppCompatActivity() {
 
         override fun run() {
             val data = getData()
-            if(data != null){
-                adapter = VorlesungsplanAdapter(items = data, context = applicationContext)
-                mainRecyclerView.adapter = adapter
-            }
-
+            wek = data
+            wait = false
         }
 
-        private fun getData(): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
+        private fun getData(): List<Vorlesungstag> {    //reads out the Information from the Website and saves it in the returned Array
             val week: ArrayList<Vorlesungstag> =
                 ArrayList<Vorlesungstag>()    //Holds Information about the hole week
             val site: Document =
@@ -75,6 +82,5 @@ class MainActivity : AppCompatActivity() {
             //log.info("Text: "+jsup)
             return jsup
         }
-
     }
 }
