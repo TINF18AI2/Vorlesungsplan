@@ -4,8 +4,9 @@ import java.util.*
 
 class VorlesungsplanItem(
     val title: String,
-    val startTime: Date,
-    val endTime: Date,
-    val description: String
+    val date: String, //Tag der Vorlesung
+    val startTime: String, //Startzeit (Stunde + Minute)
+    val endTime: String, //Startzeit (Stunde + Minute)
+    val description: String //Raum...
 ) {
 }
