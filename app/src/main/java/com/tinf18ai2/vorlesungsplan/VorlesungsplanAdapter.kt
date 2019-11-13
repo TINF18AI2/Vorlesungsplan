@@ -4,17 +4,26 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
+import org.w3c.dom.Text
 
-class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
+class VorlesungsplanAdapter(val items: List<Vorlesungstag>, val context: Context) :
     RecyclerView.Adapter<VorlesungsPlanItemHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VorlesungsPlanItemHolder {
+
+        val view = LayoutInflater.from(context).inflate(
+            R.layout.main_recycler_view_item_layout,
+            parent,
+            false
+        )
+        val title: TextView = view.textViewTitle
+        val time: TextView = view.textViewTime
+
         return VorlesungsPlanItemHolder(
-            LayoutInflater.from(context).inflate(
-                R.layout.main_recycler_view_item_layout,
-                parent,
-                false
-            )
+            titleTextView = title, timeTextView = time, v = view
+
         )
     }
 
@@ -23,12 +32,12 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
     }
 
     override fun onBindViewHolder(holder: VorlesungsPlanItemHolder, position: Int) {
-        holder?.textViewTitle = items.get(position).title
+        holder.titleTextView.text = items.get(position).tag
+        holder.timeTextView.text = items.get(position).items.toString()
     }
 }
 
-class VorlesungsPlanItemHolder(v: View) : RecyclerView.ViewHolder(v){
+class VorlesungsPlanItemHolder(var titleTextView: TextView, var timeTextView: TextView, v: View) :
+    RecyclerView.ViewHolder(v)
 
-    var textViewTitle : String = ""
 
-}
