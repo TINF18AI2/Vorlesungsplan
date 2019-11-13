@@ -39,18 +39,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun getData(): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
-            log.info("\n\ndrin\n\n")
             val week: ArrayList<Vorlesungstag> =
                 ArrayList<Vorlesungstag>()    //Holds Information about the hole week
             val site: Document =
                 readWebsite("https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001")  //This is the raw source code of the website
 
-
-            log.info("\n\ndrin2\n\n")
-            val days = site.getElementsByClass("ui-grid-e").first()
-                .allElements     //Array which holds information about every day in the week
+            val days = site.getElementsByClass("ui-grid-e").first().children()//Array which holds information about every day in the week
 
             for (day in days) {
+                log.info("\n\nTest: "+day.toString())
                 val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
                 for (elem in day.getElementsByClass("ui-li ui-li-static ui-body-b")) {
                     items.add(
@@ -63,18 +60,20 @@ class MainActivity : AppCompatActivity() {
                 }
                 week.add(
                     Vorlesungstag(
-                        day.getElementsByClass("ui-li ui-li-divider ui-btn ui-bar-b ui-corner-top ui-btn-up-undefined").first().text(),
+                        day.getElementsByAttributeValue("data-role","list-divider").first().text(),
                         items
                     )
                 )
             }
-            log.info("\n\nInfo: " + week.get(0).items.get(0).title + "\n\n")
+            log.info("Week: "+week.toString())
             return week
 
         }
 
         private fun readWebsite(url: String): Document {
-            return Jsoup.connect(url).get()
+            val jsup : Document = Jsoup.connect(url).get()
+            //log.info("Text: "+jsup)
+            return jsup
         }
 
     }
