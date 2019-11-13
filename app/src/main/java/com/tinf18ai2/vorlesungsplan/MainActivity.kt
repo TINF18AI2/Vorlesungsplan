@@ -1,5 +1,6 @@
 package com.tinf18ai2.vorlesungsplan
 
+import android.os.AsyncTask
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,15 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
 
-        var week = VorlesungsplanAnalyser().analyse()
+        //fab.setOnClickListener { v: View? ->
+        //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
+        //    startActivity(browserIntent)
+        //}
+
+        LoadData().execute()
+    }
+
+    fun showPlan(week: List<Vorlesungstag>){
         var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
 
         for (day in week) {
@@ -33,10 +42,18 @@ class MainActivity : AppCompatActivity() {
         log.info("allItems: " + allItems.toString())
         adapter = VorlesungsplanAdapter(items = allItems, context = applicationContext)
         mainRecyclerView.adapter = adapter
+    }
 
-        //fab.setOnClickListener { v: View? ->
-        //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
-        //    startActivity(browserIntent)
-        //}
+    private inner class LoadData : AsyncTask<Void, Void, List<Vorlesungstag>>() {
+        override fun doInBackground(vararg p0: Void?): List<Vorlesungstag> {
+            return AsyncPlanAnalyser().analyse()
+        }
+
+        override fun onPostExecute(result: List<Vorlesungstag>?) {
+            super.onPostExecute(result)
+            if (result != null) {
+                showPlan(result)
+            }
+        }
     }
 }
