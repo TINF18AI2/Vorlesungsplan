@@ -12,12 +12,13 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import java.util.logging.Logger
 
 class VorlesungsplanAnalyser{
 
 
-    private var URL =
+    public var URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
 
 
@@ -40,6 +41,7 @@ class VorlesungsplanAnalyser{
             val data = getData()
             wek = data
             wait = false
+            this.interrupt()
         }
 
         private fun getData(): List<Vorlesungstag> {    //reads out the Information from the Website and saves it in the returned Array

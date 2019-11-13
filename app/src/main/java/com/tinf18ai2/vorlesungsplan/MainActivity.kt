@@ -1,6 +1,7 @@
 package com.tinf18ai2.vorlesungsplan
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -38,5 +39,7 @@ class MainActivity : AppCompatActivity() {
         //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
         //    startActivity(browserIntent)
         //}
+        fab.setOnClickListener(View.OnClickListener { view -> TimeUntilUniEnd(applicationContext).show() })
     }
+
 }
