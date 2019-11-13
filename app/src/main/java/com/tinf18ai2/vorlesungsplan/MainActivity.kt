@@ -1,6 +1,7 @@
 package com.tinf18ai2.vorlesungsplan
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 
@@ -9,11 +10,20 @@ import kotlinx.android.synthetic.main.content_main.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.logging.Logger
+import android.net.Uri
+import android.content.Intent
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: VorlesungsplanAdapter
+
+    private var URL =
+        "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
 
 
     var wek: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
@@ -44,6 +54,10 @@ class MainActivity : AppCompatActivity() {
         adapter = VorlesungsplanAdapter(items = allItems, context = applicationContext)
         mainRecyclerView.adapter = adapter
 
+        fab.setOnClickListener { v: View? ->
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
+            startActivity(browserIntent)
+        }
     }
 
 
@@ -59,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             val week: ArrayList<Vorlesungstag> =
                 ArrayList<Vorlesungstag>()    //Holds Information about the hole week
             val site: Document =
-                readWebsite("https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001")  //This is the raw source code of the website
+                readWebsite(URL)  //This is the raw source code of the website
 
             val days = site.getElementsByClass("ui-grid-e").first()
                 .children()//Array which holds information about every day in the week
