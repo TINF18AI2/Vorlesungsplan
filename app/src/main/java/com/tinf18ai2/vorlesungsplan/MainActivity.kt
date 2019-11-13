@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: VorlesungsplanAdapter
 
 
-    var wek : List<Vorlesungstag> = ArrayList<Vorlesungstag>()
+    var wek: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     var log: Logger = Logger.getGlobal()
-    var wait : Boolean = true
+    var wait: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +28,20 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         val t = DemoThread()
         t.start()
-        while (wait){
+        while (wait) {
         }
         log.info("Out")
-        adapter = VorlesungsplanAdapter(items = wek, context = applicationContext)
+
+        var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
+
+        for (day in wek) {
+            for (item in day.items) {
+                allItems.add(item)
+            }
+        }
+        log.info("wek: " + wek.toString())
+        log.info("allItems: " + allItems.toString())
+        adapter = VorlesungsplanAdapter(items = allItems, context = applicationContext)
         mainRecyclerView.adapter = adapter
 
     }
@@ -51,10 +61,11 @@ class MainActivity : AppCompatActivity() {
             val site: Document =
                 readWebsite("https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001")  //This is the raw source code of the website
 
-            val days = site.getElementsByClass("ui-grid-e").first().children()//Array which holds information about every day in the week
+            val days = site.getElementsByClass("ui-grid-e").first()
+                .children()//Array which holds information about every day in the week
 
             for (day in days) {
-                log.info("\n\nTest: "+day.toString())
+                log.info("\n\nTest: " + day.toString())
                 val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
                 for (elem in day.getElementsByClass("ui-li ui-li-static ui-body-b")) {
                     items.add(
@@ -67,18 +78,18 @@ class MainActivity : AppCompatActivity() {
                 }
                 week.add(
                     Vorlesungstag(
-                        day.getElementsByAttributeValue("data-role","list-divider").first().text(),
+                        day.getElementsByAttributeValue("data-role", "list-divider").first().text(),
                         items
                     )
                 )
             }
-            log.info("Week: "+week.toString())
+            log.info("Week: " + week.toString())
             return week
 
         }
 
         private fun readWebsite(url: String): Document {
-            val jsup : Document = Jsoup.connect(url).get()
+            val jsup: Document = Jsoup.connect(url).get()
             //log.info("Text: "+jsup)
             return jsup
         }

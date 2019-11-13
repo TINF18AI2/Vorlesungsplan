@@ -7,9 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
-import org.w3c.dom.Text
 
-class VorlesungsplanAdapter(val items: List<Vorlesungstag>, val context: Context) :
+class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
     RecyclerView.Adapter<VorlesungsPlanItemHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VorlesungsPlanItemHolder {
 
@@ -32,8 +31,8 @@ class VorlesungsplanAdapter(val items: List<Vorlesungstag>, val context: Context
     }
 
     override fun onBindViewHolder(holder: VorlesungsPlanItemHolder, position: Int) {
-        holder.titleTextView.text = items.get(position).tag
-        holder.timeTextView.text = items.get(position).items.toString()
+        holder.titleTextView.text = items.get(position).title
+        holder.timeTextView.text = items.get(position).time
     }
 }
 
