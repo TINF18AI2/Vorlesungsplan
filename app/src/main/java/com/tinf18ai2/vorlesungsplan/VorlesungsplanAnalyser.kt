@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import java.util.logging.Logger
 
 class VorlesungsplanAnalyser{
@@ -53,22 +54,42 @@ class VorlesungsplanAnalyser{
             for (day in days) {
                 log.info("\n\nDay: " + day.toString())
                 val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
-                for (elem in day.select("li[class=ui-li-static]")) {
-                    log.info("\n\nItem: " + elem.toString())
-                    items.add(
-                        VorlesungsplanItem(
-                            elem.getElementsByClass("cal-title").first().text(),
-                            elem.getElementsByClass("cal-time").first().text(),
-                            elem.getElementsByClass("cal-res").first().text()
+                var first : Boolean = true
+                if(day.select("ul").isNotEmpty()){
+                    if(day.select("ul").first().children().isNotEmpty()){
+                        for (elem in day.select("ul").first().children()) {
+
+                            if (first){
+                                first = false
+                            }else{
+                                log.info("\n\nItem: " + elem.toString())
+                                var info : String = ""
+                                if (elem.getElementsByClass("cal-res").isEmpty()){
+                                    info = elem.getElementsByClass("cal-text").first().text()
+                                }else{
+                                    info = elem.getElementsByClass("cal-res").first().text()
+                                }
+                                items.add(
+                                    VorlesungsplanItem(
+                                        elem.getElementsByClass("cal-title").first().text(),
+                                        elem.getElementsByClass("cal-time").first().text(),
+                                        info
+                                    )
+                                )
+                            }
+
+                        }
+                    }
+                }
+
+                if(day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()){
+                    week.add(
+                        Vorlesungstag(
+                            day.getElementsByAttributeValue("data-role", "list-divider").first().text(),
+                            items
                         )
                     )
                 }
-                week.add(
-                    Vorlesungstag(
-                        day.getElementsByAttributeValue("data-role", "list-divider").first().text(),
-                        items
-                    )
-                )
             }
             log.info("Week: " + week.toString())
             return week

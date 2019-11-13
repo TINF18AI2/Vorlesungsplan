@@ -29,10 +29,12 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
+
         var week = VorlesungsplanAnalyser().analyse()
         var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
 
         for (day in week) {
+            allItems.add(VorlesungsplanItem(day.tag,"",""))
             for (item in day.items) {
                 allItems.add(item)
             }
@@ -47,7 +49,4 @@ class MainActivity : AppCompatActivity() {
         //    startActivity(browserIntent)
         //}
     }
-
-
-
 }
