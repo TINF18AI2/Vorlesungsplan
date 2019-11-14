@@ -11,8 +11,8 @@ android {
         applicationId "com.tinf18ai2.vorlesungsplan"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 9
-        versionName "1.0.9"
+        versionCode 10
+        versionName "1.0.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
