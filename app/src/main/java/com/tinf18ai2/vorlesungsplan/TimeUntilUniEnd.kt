@@ -1,20 +1,11 @@
 package com.tinf18ai2.vorlesungsplan
 
-import android.content.Context
-import android.os.AsyncTask
-import android.widget.Toast
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
-import java.lang.Error
-import java.lang.NullPointerException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
 
-class TimeUntilUniEnd(){
+class TimeUntilUniEnd{
 
     var log: Logger = Logger.getGlobal()
 
