@@ -13,7 +13,6 @@ class AsyncPlanAnalyser {
     private val URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
 
-    var wek: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     var log: Logger = Logger.getGlobal()
 
     fun analyse(): List<Vorlesungstag> {
@@ -32,7 +31,6 @@ class AsyncPlanAnalyser {
             .children()//Array which holds information about every day in the week
 
         for (day in days) {
-            log.info("\n\nDay: " + day.toString())
             val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
             var first: Boolean = true
             if (day.select("ul").isNotEmpty()) {
@@ -42,7 +40,8 @@ class AsyncPlanAnalyser {
                         if (first) {
                             first = false
                         } else {
-                            log.info("\n\nItem: " + elem.toString())
+                            var timeString = elem.getElementsByClass("cal-time").first().text()
+                            var times = getTimes(timeString)
                             var info: String = ""
                             if (elem.getElementsByClass("cal-res").isEmpty()) {
                                 info = elem.getElementsByClass("cal-text").first().text()
@@ -52,8 +51,10 @@ class AsyncPlanAnalyser {
                             items.add(
                                 VorlesungsplanItem(
                                     elem.getElementsByClass("cal-title").first().text(),
-                                    elem.getElementsByClass("cal-time").first().text(),
-                                    info
+                                    timeString,
+                                    info,
+                                    times.start,
+                                    times.end
                                 )
                             )
                         }
@@ -74,14 +75,12 @@ class AsyncPlanAnalyser {
                 )
             }
         }
-        log.info("Week: " + week.toString())
         return week
 
     }
 
     private fun readWebsite(url: String): Document {
         val jsup: Document = Jsoup.connect(url).get()
-        //log.info("Text: "+jsup)
         return jsup
     }
 
@@ -93,9 +92,16 @@ class AsyncPlanAnalyser {
             }
             dateString = dateString.substring(1)
         }
-        var date = SimpleDateFormat("dd.MM").parse(dateString.trim())
+        var date : Date = SimpleDateFormat("dd.MM").parse(dateString.trim())
         return date
     }
 
+    private fun getTimes(times: String) : Times{
+        var t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
+        var t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
 
+        return Times(t1,t2)
+    }
+
+    private class Times(val start: Date,val end: Date)
 }
