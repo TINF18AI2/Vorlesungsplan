@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:navigationIcon="@mipmap/ic_launcher_round"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,7 +29,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:background="?attr/colorAccent"/>
+        android:background="?attr/colorPrimary"
+        android:src="@drawable/ic_time_white"
+        app:backgroundTint="?attr/colorPrimary" />
 
     <!--        app:srcCompat="@android:drawable/" -->
 
