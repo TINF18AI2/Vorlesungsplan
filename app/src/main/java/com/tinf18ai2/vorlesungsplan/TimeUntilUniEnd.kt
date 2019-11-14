@@ -64,7 +64,6 @@ class TimeUntilUniEnd{
     }
     private fun getMinutes(time: String): Int {
         return getMinutes(SimpleDateFormat("HH:mm").parse(time))
-        return 0
     }
     private fun getTodayMinutes(): Int {
         val format = SimpleDateFormat("HH:mm")

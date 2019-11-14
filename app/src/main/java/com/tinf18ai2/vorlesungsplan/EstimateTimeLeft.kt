@@ -10,9 +10,7 @@ class EstimateTimeLest(val woche: List<Vorlesungstag>, val timeResultCallback: T
 
     override fun onPostExecute(result: UniAusErg) {
         super.onPostExecute(result)
-        if (result != null) {
-            timeResultCallback.onFinished(result)
-        }
+        timeResultCallback.onFinished(result)
     }
 }
 
