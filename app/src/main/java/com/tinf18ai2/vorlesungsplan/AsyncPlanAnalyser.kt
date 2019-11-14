@@ -55,7 +55,9 @@ class AsyncPlanAnalyser {
                                 VorlesungsplanItem(
                                     elem.getElementsByClass("cal-title").first().text(),
                                     elem.getElementsByClass("cal-time").first().text(),
-                                    info
+                                    info,
+                                    Date(),
+                                    Date()
                                 )
                             )
                         }
