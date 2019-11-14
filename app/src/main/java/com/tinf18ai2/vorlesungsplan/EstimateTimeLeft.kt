@@ -3,12 +3,12 @@ package com.tinf18ai2.vorlesungsplan
 import android.os.AsyncTask
 
 class EstimateTimeLest(val woche: List<Vorlesungstag>, val timeResultCallback: TimeResultCallback) :
-    AsyncTask<Void, Void, String>() {
-    override fun doInBackground(vararg p0: Void?): String {
+    AsyncTask<Void, Void, UniAusErg>() {
+    override fun doInBackground(vararg p0: Void?): UniAusErg {
         return TimeUntilUniEnd().getTimeLeft(woche)
     }
 
-    override fun onPostExecute(result: String?) {
+    override fun onPostExecute(result: UniAusErg) {
         super.onPostExecute(result)
         if (result != null) {
             timeResultCallback.onFinished(result)
@@ -17,5 +17,5 @@ class EstimateTimeLest(val woche: List<Vorlesungstag>, val timeResultCallback: T
 }
 
 interface TimeResultCallback {
-    fun onFinished(time: String)
+    fun onFinished(time: UniAusErg)
 }

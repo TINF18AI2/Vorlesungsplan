@@ -1,7 +1,9 @@
 package com.tinf18ai2.vorlesungsplan
 
+import android.annotation.SuppressLint
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
@@ -15,24 +17,20 @@ class AsyncPlanAnalyser {
 
     var log: Logger = Logger.getGlobal()
 
-    fun analyse(): List<Vorlesungstag> {
-
-        var data = getData()
-        return data
+    fun analyse(): List<Vorlesungstag>? {
+        return getData()
     }
 
-    private fun getData(): List<Vorlesungstag> {    //reads out the Information from the Website and saves it in the returned Array
-        val week: ArrayList<Vorlesungstag> =
-            ArrayList<Vorlesungstag>()    //Holds Information about the hole week
-        val site: Document =
-            readWebsite(URL)  //This is the raw source code of the website
+    private fun getData(): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
+        val week: ArrayList<Vorlesungstag> = ArrayList()    //Holds Information about the hole week
+        val site: Document = readWebsite(URL) ?: return null  //returns null if site==null
 
         val days = site.getElementsByClass("ui-grid-e").first()
             .children()//Array which holds information about every day in the week
 
         for (day in days) {
             val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
-            var first: Boolean = true
+            var first = true
             if (day.select("ul").isNotEmpty()) {
                 if (day.select("ul").first().children().isNotEmpty()) {
                     for (elem in day.select("ul").first().children()) {
@@ -40,14 +38,14 @@ class AsyncPlanAnalyser {
                         if (first) {
                             first = false
                         } else {
-                            var timeString = elem.getElementsByClass("cal-time").first().text()
-                            var times = getTimes(timeString)
-                            var info: String = ""
-                            if (elem.getElementsByClass("cal-res").isEmpty()) {
-                                info = elem.getElementsByClass("cal-text").first().text()
-                            } else {
-                                info = elem.getElementsByClass("cal-res").first().text()
-                            }
+                            val timeString = elem.getElementsByClass("cal-time").first().text()
+                            val times = getTimes(timeString)
+                            val info: String =
+                                if (elem.getElementsByClass("cal-res").isEmpty()) {
+                                    elem.getElementsByClass("cal-text").first().text()
+                                } else {
+                                    elem.getElementsByClass("cal-res").first().text()
+                                }
                             items.add(
                                 VorlesungsplanItem(
                                     elem.getElementsByClass("cal-title").first().text(),
@@ -64,7 +62,7 @@ class AsyncPlanAnalyser {
             }
 
             if (day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()) {
-                var dayString: String =
+                val dayString: String =
                     day.getElementsByAttributeValue("data-role", "list-divider").first().text()
                 week.add(
                     Vorlesungstag(
@@ -79,26 +77,28 @@ class AsyncPlanAnalyser {
 
     }
 
-    private fun readWebsite(url: String): Document {
-        val jsup: Document = Jsoup.connect(url).get()
-        return jsup
+    private fun readWebsite(url: String): Document? {
+        return try {
+            Jsoup.connect(url).get()
+        }catch (e : Exception){
+            null
+        }
     }
 
-    private fun isolateTime(dateString: String): Date {
-        var dateString = dateString
+    private fun isolateTime(dateStringIn: String): Date {
+        var dateString = dateStringIn
         if (dateString.contains(",")) {
             while (dateString.substring(0, 1) != ",") {
                 dateString = dateString.substring(1)
             }
             dateString = dateString.substring(1)
         }
-        var date : Date = SimpleDateFormat("dd.MM").parse(dateString.trim())
-        return date
+        return SimpleDateFormat("dd.MM").parse(dateString.trim())
     }
 
     private fun getTimes(times: String) : Times{
-        var t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
-        var t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
+        val t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
+        val t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
 
         return Times(t1,t2)
     }

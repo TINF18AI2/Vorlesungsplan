@@ -9,17 +9,10 @@ class TimeUntilUniEnd{
 
     var log: Logger = Logger.getGlobal()
 
-    fun getTimeLeft(week: List<Vorlesungstag>) : String{
-        val wann = vorlesungsEnde(week)
-        var ende = ""
-        if (wann.timeLeft < 0) {
-            ende = "Zurzeit findet keine Vorlesung für den Kurs TINF-18 AI2 statt."
-        } else {
-            ende = "Noch ${wann.timeLeft} Minuten bis zum Vorlesungsende von ${wann.name}!"
-        }
-        return ende
+    fun getTimeLeft(week: List<Vorlesungstag>) : UniAusErg{
+        return vorlesungsEnde(week)
     }
-    fun vorlesungsEnde(week: List<Vorlesungstag>): UniAusErg {
+    private fun vorlesungsEnde(week: List<Vorlesungstag>): UniAusErg {
         val formatter = SimpleDateFormat("dd.MM")
         val date = Date(System.currentTimeMillis())
         val todayDate : String = formatter.format(date)
@@ -79,7 +72,7 @@ class TimeUntilUniEnd{
         //return(getMinutes("11:00"))//For testing
     }
 
-    fun getToday(date : String, week: List<Vorlesungstag>, format: SimpleDateFormat) : Vorlesungstag? {
+    private fun getToday(date : String, week: List<Vorlesungstag>, format: SimpleDateFormat) : Vorlesungstag? {
         var today : Vorlesungstag? = null
         for(day in week){
             if(format.format(day.tagDate)==date){

@@ -18,8 +18,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var adapter: VorlesungsplanAdapter
+    private var networkError : Boolean = false
 
-    var woche: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
+    var woche: List<Vorlesungstag> = ArrayList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -28,11 +30,16 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
-            EstimateTimeLest(woche = woche, timeResultCallback = object : TimeResultCallback {
-                override fun onFinished(time: String) {
-                    showTimeLeft(time)
-                }
-            }).execute()
+            if(!networkError){
+                EstimateTimeLest(woche = woche, timeResultCallback = object : TimeResultCallback {
+                    override fun onFinished(time: UniAusErg) {
+                        showTimeLeft(time)
+                    }
+                }).execute()
+            }else{
+                makeSnackbar(getString(R.string.network_error_msg))
+                reloadViews()
+            }
         }
         reloadViews()
 
@@ -42,15 +49,21 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
         LoadData(weekDataCallback = object : WeekDataCallback {
-            override fun onDataRecieved(list: List<Vorlesungstag>) {
-                woche = list
-                mainRecyclerView.visibility = VISIBLE
-                progressBar.visibility = INVISIBLE
-                adapter = VorlesungsplanAdapter(
-                    items = ListItemProvider.getAllListItems(list),
-                    context = applicationContext
-                )
-                mainRecyclerView.adapter = adapter
+            override fun onDataRecieved(list: List<Vorlesungstag>?) {
+                if (list == null) {
+                    makeSnackbar(getString(R.string.network_error_msg))
+                    networkError = true
+                }else {
+                    networkError = false
+                    woche = list
+                    mainRecyclerView.visibility = VISIBLE
+                    progressBar.visibility = INVISIBLE
+                    adapter = VorlesungsplanAdapter(
+                        items = ListItemProvider.getAllListItems(list),
+                        context = applicationContext
+                    )
+                    mainRecyclerView.adapter = adapter
+                }
             }
         }).execute()
 
@@ -62,8 +75,17 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun showTimeLeft(time: String) {
-        Snackbar.make(mainView, time, Snackbar.LENGTH_LONG)
-            .show()
+    fun showTimeLeft(wann: UniAusErg) {
+        var ende =
+            if (wann.timeLeft < 0) {
+                getString(R.string.no_class_msg)
+            } else {
+                getString(R.string.time_left_msg,wann.timeLeft,wann.name)
+            }
+        makeSnackbar(ende)
+    }
+
+    fun makeSnackbar(msg: String){
+        Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show()
     }
 }

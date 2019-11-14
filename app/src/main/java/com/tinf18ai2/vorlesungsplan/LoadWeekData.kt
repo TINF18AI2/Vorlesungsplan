@@ -4,18 +4,16 @@ import android.os.AsyncTask
 
 class LoadData(var weekDataCallback: WeekDataCallback) :
     AsyncTask<Void, Void, List<Vorlesungstag>>() {
-    override fun doInBackground(vararg p0: Void?): List<Vorlesungstag> {
+    override fun doInBackground(vararg p0: Void?): List<Vorlesungstag>? {
         return AsyncPlanAnalyser().analyse()
     }
 
     override fun onPostExecute(result: List<Vorlesungstag>?) {
         super.onPostExecute(result)
-        if (result != null) {
-            weekDataCallback.onDataRecieved(result)
-        }
+        weekDataCallback.onDataRecieved(result)
     }
 }
 
 interface WeekDataCallback {
-    fun onDataRecieved(list: List<Vorlesungstag>)
+    fun onDataRecieved(list: List<Vorlesungstag>?)
 }
