@@ -1,6 +1,8 @@
 package com.tinf18ai2.vorlesungsplan
 
+import android.app.ActionBar
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -37,8 +39,9 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         holder.titleTextView.text = item.title
         holder.timeTextView.text = item.time
         if (item.time.equals("")) {
-            holder.titleTextView.setTextSize(25.toFloat())
-            holder.titleTextView.setTextColor(Color.GRAY)
+            holder.titleTextView.setTextSize(20.toFloat())
+            holder.titleTextView.setTextColor(Color.parseColor("#820000"))
+//            holder.titleTextView.setTextColor(Color.GRAY)
         }
     }
 }

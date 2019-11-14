@@ -1,9 +1,7 @@
 package com.tinf18ai2.vorlesungsplan
 
-import android.os.AsyncTask
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
@@ -12,13 +10,13 @@ import kotlin.collections.ArrayList
 
 class AsyncPlanAnalyser {
 
-    private var URL =
+    private val URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
 
     var wek: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     var log: Logger = Logger.getGlobal()
 
-    fun analyse() : List<Vorlesungstag>{
+    fun analyse(): List<Vorlesungstag> {
 
         var data = getData()
         return data
@@ -36,19 +34,19 @@ class AsyncPlanAnalyser {
         for (day in days) {
             log.info("\n\nDay: " + day.toString())
             val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
-            var first : Boolean = true
-            if(day.select("ul").isNotEmpty()){
-                if(day.select("ul").first().children().isNotEmpty()){
+            var first: Boolean = true
+            if (day.select("ul").isNotEmpty()) {
+                if (day.select("ul").first().children().isNotEmpty()) {
                     for (elem in day.select("ul").first().children()) {
 
-                        if (first){
+                        if (first) {
                             first = false
-                        }else{
+                        } else {
                             log.info("\n\nItem: " + elem.toString())
-                            var info : String = ""
-                            if (elem.getElementsByClass("cal-res").isEmpty()){
+                            var info: String = ""
+                            if (elem.getElementsByClass("cal-res").isEmpty()) {
                                 info = elem.getElementsByClass("cal-text").first().text()
-                            }else{
+                            } else {
                                 info = elem.getElementsByClass("cal-res").first().text()
                             }
                             items.add(
@@ -64,8 +62,9 @@ class AsyncPlanAnalyser {
                 }
             }
 
-            if(day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()){
-                var dayString : String = day.getElementsByAttributeValue("data-role", "list-divider").first().text()
+            if (day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()) {
+                var dayString: String =
+                    day.getElementsByAttributeValue("data-role", "list-divider").first().text()
                 week.add(
                     Vorlesungstag(
                         dayString,
@@ -86,10 +85,10 @@ class AsyncPlanAnalyser {
         return jsup
     }
 
-    private fun isolateTime(dateString :String): Date{
+    private fun isolateTime(dateString: String): Date {
         var dateString = dateString
-        if (dateString.contains(",")){
-            while(dateString.substring(0,1)!=","){
+        if (dateString.contains(",")) {
+            while (dateString.substring(0, 1) != ",") {
                 dateString = dateString.substring(1)
             }
             dateString = dateString.substring(1)
