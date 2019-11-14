@@ -1,6 +1,7 @@
-package com.tinf18ai2.vorlesungsplan
+package com.tinf18ai2.vorlesungsplan.BackendServices
 
-import android.annotation.SuppressLint
+import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
+import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.lang.Exception
@@ -96,11 +97,11 @@ class AsyncPlanAnalyser {
         return SimpleDateFormat("dd.MM").parse(dateString.trim())
     }
 
-    private fun getTimes(times: String) : Times{
+    private fun getTimes(times: String) : Times {
         val t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
         val t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
 
-        return Times(t1,t2)
+        return Times(t1, t2)
     }
 
     private class Times(val start: Date,val end: Date)

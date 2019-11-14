@@ -1,6 +1,7 @@
-package com.tinf18ai2.vorlesungsplan
+package com.tinf18ai2.vorlesungsplan.BackendServices
 
 import android.os.AsyncTask
+import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
 
 class EstimateTimeLest(val woche: List<Vorlesungstag>, val timeResultCallback: TimeResultCallback) :
     AsyncTask<Void, Void, UniAusErg>() {

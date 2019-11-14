@@ -1,5 +1,6 @@
-package com.tinf18ai2.vorlesungsplan
+package com.tinf18ai2.vorlesungsplan.BackendServices
 
+import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -9,7 +10,7 @@ class TimeUntilUniEnd{
 
     var log: Logger = Logger.getGlobal()
 
-    fun getTimeLeft(week: List<Vorlesungstag>) : UniAusErg{
+    fun getTimeLeft(week: List<Vorlesungstag>) : UniAusErg {
         return vorlesungsEnde(week)
     }
     private fun vorlesungsEnde(week: List<Vorlesungstag>): UniAusErg {
@@ -23,11 +24,12 @@ class TimeUntilUniEnd{
             e.printStackTrace()
         }
 
-        return UniAusErg(-1,"")
+        return UniAusErg(-1, "")
     }
 
     private fun uniAus(today: Vorlesungstag): UniAusErg {
-        var erg : UniAusErg = UniAusErg(-1,"")
+        var erg : UniAusErg =
+            UniAusErg(-1, "")
         try {
             val now = getTodayMinutes()
             for (item in today.items){

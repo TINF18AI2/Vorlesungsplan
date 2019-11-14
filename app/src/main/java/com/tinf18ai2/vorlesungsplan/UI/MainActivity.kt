@@ -1,4 +1,4 @@
-package com.tinf18ai2.vorlesungsplan
+package com.tinf18ai2.vorlesungsplan.UI
 
 import android.os.Bundle
 import android.view.View.INVISIBLE
@@ -6,6 +6,9 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.tinf18ai2.vorlesungsplan.BackendServices.*
+import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.logging.Logger
@@ -31,11 +34,14 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             if (!networkError) {
-                EstimateTimeLest(woche = woche, timeResultCallback = object : TimeResultCallback {
-                    override fun onFinished(time: UniAusErg) {
-                        showTimeLeft(time)
-                    }
-                }).execute()
+                EstimateTimeLest(
+                    woche = woche,
+                    timeResultCallback = object :
+                        TimeResultCallback {
+                        override fun onFinished(time: UniAusErg) {
+                            showTimeLeft(time)
+                        }
+                    }).execute()
             } else {
                 reloadViews()
             }
@@ -47,7 +53,8 @@ class MainActivity : AppCompatActivity() {
     private fun reloadViews() {
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
-        LoadData(weekDataCallback = object : WeekDataCallback {
+        LoadData(weekDataCallback = object :
+            WeekDataCallback {
             override fun onDataRecieved(list: List<Vorlesungstag>?) {
                 if (list == null) {
                     makeSnackBar(getString(R.string.network_error_msg))
@@ -58,7 +65,9 @@ class MainActivity : AppCompatActivity() {
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
                     adapter = VorlesungsplanAdapter(
-                        items = ListItemProvider.getAllListItems(list),
+                        items = ListItemProvider.getAllListItems(
+                            list
+                        ),
                         context = applicationContext
                     )
                     mainRecyclerView.adapter = adapter

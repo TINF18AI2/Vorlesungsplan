@@ -1,15 +1,14 @@
-package com.tinf18ai2.vorlesungsplan
+package com.tinf18ai2.vorlesungsplan.UI
 
-import android.app.ActionBar
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
+import com.tinf18ai2.vorlesungsplan.R
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
 
 class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
