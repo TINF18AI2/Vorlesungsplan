@@ -3,7 +3,11 @@ package com.tinf18ai2.vorlesungsplan
 import android.os.AsyncTask
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.logging.Logger
+import kotlin.collections.ArrayList
 
 
 class AsyncPlanAnalyser {
@@ -61,10 +65,12 @@ class AsyncPlanAnalyser {
             }
 
             if(day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()){
+                var dayString : String = day.getElementsByAttributeValue("data-role", "list-divider").first().text()
                 week.add(
                     Vorlesungstag(
-                        day.getElementsByAttributeValue("data-role", "list-divider").first().text(),
-                        items
+                        dayString,
+                        items,
+                        isolateTime(dayString)
                     )
                 )
             }
@@ -79,4 +85,18 @@ class AsyncPlanAnalyser {
         //log.info("Text: "+jsup)
         return jsup
     }
+
+    private fun isolateTime(dateString :String): Date{
+        var dateString = dateString
+        if (dateString.contains(",")){
+            while(dateString.substring(0,1)!=","){
+                dateString = dateString.substring(1)
+            }
+            dateString = dateString.substring(1)
+        }
+        var date = SimpleDateFormat("dd.MM").parse(dateString.trim())
+        return date
+    }
+
+
 }
