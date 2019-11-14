@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     var log: Logger = Logger.getGlobal()
     private lateinit var adapter: VorlesungsplanAdapter
 
-    var woche : List<Vorlesungstag> = ArrayList<Vorlesungstag>()
+    var woche: List<Vorlesungstag> = ArrayList<Vorlesungstag>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -27,11 +27,7 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
 
-        //fab.setOnClickListener { v: View? ->
-        //    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URL))
-        //    startActivity(browserIntent)
-        //}
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             estimateTimeLeft().execute()
         }
         LoadData().execute()
@@ -42,11 +38,19 @@ class MainActivity : AppCompatActivity() {
         LoadData().execute()
     }
 
-    fun showPlan(week: List<Vorlesungstag>){
-        var allItems: ArrayList<VorlesungsplanItem> = ArrayList()
+    fun showPlan(week: List<Vorlesungstag>) {
+        val allItems: ArrayList<VorlesungsplanItem> = ArrayList()
 
         for (day in week) {
-            allItems.add(VorlesungsplanItem(day.tag,"","", SimpleDateFormat("dd.MM").parse("00.00"),SimpleDateFormat("dd.MM").parse("00.00")))
+            allItems.add(
+                VorlesungsplanItem(
+                    day.tag,
+                    "",
+                    "",
+                    SimpleDateFormat("dd.MM").parse("00.00"),
+                    SimpleDateFormat("dd.MM").parse("00.00")
+                )
+            )
             for (item in day.items) {
                 allItems.add(item)
             }
@@ -57,9 +61,9 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.adapter = adapter
     }
 
-    fun showTimeLeft(time: String){
+    fun showTimeLeft(time: String) {
         Snackbar.make(mainView, time, Snackbar.LENGTH_LONG)
-            .setAction("Action", null).show()
+            .show()
     }
 
     private inner class LoadData : AsyncTask<Void, Void, List<Vorlesungstag>>() {
