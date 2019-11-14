@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var adapter: VorlesungsplanAdapter
-    private var networkError : Boolean = false
+    private var networkError: Boolean = false
 
     var woche: List<Vorlesungstag> = ArrayList()
 
@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
-            if(!networkError){
+            if (!networkError) {
                 EstimateTimeLest(woche = woche, timeResultCallback = object : TimeResultCallback {
                     override fun onFinished(time: UniAusErg) {
                         showTimeLeft(time)
                     }
                 }).execute()
-            }else{
+            } else {
                 reloadViews()
             }
         }
@@ -50,9 +50,9 @@ class MainActivity : AppCompatActivity() {
         LoadData(weekDataCallback = object : WeekDataCallback {
             override fun onDataRecieved(list: List<Vorlesungstag>?) {
                 if (list == null) {
-                    makeSnackbar(getString(R.string.network_error_msg))
+                    makeSnackBar(getString(R.string.network_error_msg))
                     networkError = true
-                }else {
+                } else {
                     networkError = false
                     woche = list
                     mainRecyclerView.visibility = VISIBLE
@@ -74,17 +74,17 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun showTimeLeft(wann: UniAusErg) {
-        var ende =
-            if (wann.timeLeft < 0) {
+    fun showTimeLeft(timeWhen: UniAusErg) {
+        val end =
+            if (timeWhen.timeLeft < 0) {
                 getString(R.string.no_class_msg)
             } else {
-                getString(R.string.time_left_msg,wann.timeLeft,wann.name)
+                getString(R.string.time_left_msg, timeWhen.timeLeft, timeWhen.name)
             }
-        makeSnackbar(ende)
+        makeSnackBar(end)
     }
 
-    fun makeSnackbar(msg: String){
+    fun makeSnackBar(msg: String) {
         Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show()
     }
 }
