@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }).execute()
             }else{
-                makeSnackbar(getString(R.string.network_error_msg))
                 reloadViews()
             }
         }
