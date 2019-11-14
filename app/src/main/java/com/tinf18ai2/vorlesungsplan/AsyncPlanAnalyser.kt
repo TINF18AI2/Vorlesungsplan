@@ -10,7 +10,7 @@ import kotlin.collections.ArrayList
 
 class AsyncPlanAnalyser {
 
-    private val URL =
+    val URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
 
     var log: Logger = Logger.getGlobal()
