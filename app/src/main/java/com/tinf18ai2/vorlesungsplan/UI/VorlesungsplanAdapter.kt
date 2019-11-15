@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.R
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
+import org.w3c.dom.Text
 
 class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
     RecyclerView.Adapter<VorlesungsPlanItemHolder>() {
@@ -22,9 +23,13 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         )
         val title: TextView = view.textViewTitle
         val time: TextView = view.textViewTime
+        val descriptionTextView: TextView = view.textViewDescription
 
         return VorlesungsPlanItemHolder(
-            titleTextView = title, timeTextView = time, v = view
+            titleTextView = title,
+            timeTextView = time,
+            descriptionTextView = descriptionTextView,
+            v = view
 
         )
     }
@@ -37,6 +42,7 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         val item = items.get(position)
         holder.titleTextView.text = item.title
         holder.timeTextView.text = item.time
+        holder.descriptionTextView.text = item.description
         if (item.time.equals("")) {
             holder.titleTextView.setTextSize(20.toFloat())
             holder.titleTextView.setTextColor(Color.parseColor("#820000"))
@@ -48,6 +54,7 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
 class VorlesungsPlanItemHolder(
     var titleTextView: TextView,
     var timeTextView: TextView,
+    var descriptionTextView: TextView,
     v: View
 ) :
     RecyclerView.ViewHolder(v)
