@@ -1,7 +1,7 @@
-package com.tinf18ai2.vorlesungsplan.BackendServices
+package com.tinf18ai2.vorlesungsplan.backend_services
 
 import android.os.AsyncTask
-import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 
 class LoadData(var weekDataCallback: WeekDataCallback) :
     AsyncTask<Void, Void, List<Vorlesungstag>>() {

@@ -1,4 +1,4 @@
-package com.tinf18ai2.vorlesungsplan.UI
+package com.tinf18ai2.vorlesungsplan.ui
 
 import android.os.Bundle
 import android.view.View.INVISIBLE
@@ -6,8 +6,8 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.tinf18ai2.vorlesungsplan.BackendServices.*
-import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.backend_services.*
+import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*

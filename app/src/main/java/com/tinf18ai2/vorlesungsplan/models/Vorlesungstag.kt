@@ -1,6 +1,5 @@
-package com.tinf18ai2.vorlesungsplan.Models
+package com.tinf18ai2.vorlesungsplan.models
 
-import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
 import java.util.*
 
 

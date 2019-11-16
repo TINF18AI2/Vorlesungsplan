@@ -1,4 +1,4 @@
-package com.tinf18ai2.vorlesungsplan.UI
+package com.tinf18ai2.vorlesungsplan.ui
 
 import android.content.Context
 import android.graphics.Color
@@ -7,10 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
+import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.R
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
-import org.w3c.dom.Text
 
 class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
     RecyclerView.Adapter<VorlesungsPlanItemHolder>() {

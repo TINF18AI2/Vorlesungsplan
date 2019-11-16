@@ -1,7 +1,7 @@
-package com.tinf18ai2.vorlesungsplan.BackendServices
+package com.tinf18ai2.vorlesungsplan.backend_services
 
-import com.tinf18ai2.vorlesungsplan.Models.VorlesungsplanItem
-import com.tinf18ai2.vorlesungsplan.Models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
+import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import java.text.SimpleDateFormat
 
 class ListItemProvider {
