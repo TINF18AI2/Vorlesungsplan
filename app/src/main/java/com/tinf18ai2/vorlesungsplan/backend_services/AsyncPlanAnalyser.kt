@@ -15,11 +15,18 @@ class AsyncPlanAnalyser {
 
     val URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
+    val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
 
     var log: Logger = Logger.getGlobal()
 
     fun analyse(): List<Vorlesungstag>? {
         return getData()
+    }
+
+    private fun getIcalData(): List<Vorlesungstag>?{
+        val week: ArrayList<Vorlesungstag> = ArrayList()
+
+        return week
     }
 
     private fun getData(): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
