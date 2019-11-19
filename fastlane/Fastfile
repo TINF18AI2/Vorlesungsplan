@@ -37,6 +37,18 @@
 #   end
 # end
 
+ lane :beta do
+   gradle(
+     task: 'bundle',
+     build_type: 'Release'
+   )
+   supply(
+         track: 'beta',
+         aab: 'app/build/outputs/bundle/release/app-release.aab',
+         skip_upload_apk: 'true'
+   )
+ end
+
  lane :internal do
    gradle(
      task: 'bundle',
