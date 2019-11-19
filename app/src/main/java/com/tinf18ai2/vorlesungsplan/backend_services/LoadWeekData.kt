@@ -2,6 +2,7 @@ package com.tinf18ai2.vorlesungsplan.backend_services
 
 import android.os.AsyncTask
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 
 class LoadData(var weekDataCallback: WeekDataCallback, var weekShift: Int) :
     AsyncTask<Void, Void, List<Vorlesungstag>>() {

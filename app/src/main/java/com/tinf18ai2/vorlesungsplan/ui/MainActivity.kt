@@ -32,48 +32,9 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener {
-            if (!networkError) {
-                EstimateTimeLest(
-                    woche = woche,
-                    timeResultCallback = object :
-                        TimeResultCallback {
-                        override fun onFinished(time: UniAusErg) {
-                            showTimeLeft(time)
-                        }
-                    }).execute()
-            } else {
-                reloadViews()
-            }
-        }
-        reloadViews()
-
-        lastWeekButton.setOnClickListener{
-            changeWeek(-1)
-        }
-
-        nextWeekButton.setOnClickListener{
-            changeWeek(1)
-        }
-        currentWeekButton.setOnClickListener{
-            changeWeek(0)
-        }
-    }
-
-    private fun changeWeek(value: Int){
-        if(value==0){
-            weekShift = 0
-        }
-        weekShift += value
-        reloadViews()
-    }
-
-    private fun reloadViews() {
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
-        LoadData(weekDataCallback = object :
-            WeekDataCallback {
+        StateData.addSubscriber(subscriber = object : StateSubscriber {
             override fun onDataRecieved(list: List<Vorlesungstag>?) {
                 if (list == null) {
                     makeSnackBar(getString(R.string.network_error_msg))
@@ -92,13 +53,48 @@ class MainActivity : AppCompatActivity() {
                     mainRecyclerView.adapter = adapter
                 }
             }
-        },weekShift= weekShift).execute()
+        })
 
+        fab.setOnClickListener {
+            if (!networkError) {
+                EstimateTimeLeft(
+                    woche = woche,
+                    timeResultCallback = object :
+                        TimeResultCallback {
+                        override fun onFinished(time: UniAusErg) {
+                            showTimeLeft(time)
+                        }
+                    }).execute()
+            } else {
+                StateData.reloadData(weekShift)
+            }
+        }
+
+        lastWeekButton.setOnClickListener {
+            changeWeek(-1)
+        }
+
+        nextWeekButton.setOnClickListener {
+            changeWeek(1)
+        }
+        currentWeekButton.setOnClickListener {
+            changeWeek(0)
+        }
+        StateData.reloadData(weekShift)
     }
+
+    private fun changeWeek(value: Int) {
+        if (value == 0) {
+            weekShift = 0
+        }
+        weekShift += value
+        StateData.reloadData(weekShift)
+    }
+
 
     override fun onResume() {
         super.onResume()
-        reloadViews()
+        StateData.reloadData(weekShift)
     }
 
 
