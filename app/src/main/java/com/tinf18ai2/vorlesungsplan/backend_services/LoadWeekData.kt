@@ -3,10 +3,10 @@ package com.tinf18ai2.vorlesungsplan.backend_services
 import android.os.AsyncTask
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 
-class LoadData(var weekDataCallback: WeekDataCallback) :
+class LoadData(var weekDataCallback: WeekDataCallback, var weekShift: Int) :
     AsyncTask<Void, Void, List<Vorlesungstag>>() {
     override fun doInBackground(vararg p0: Void?): List<Vorlesungstag>? {
-        return AsyncPlanAnalyser().analyse()
+        return AsyncPlanAnalyser().analyse(weekShift)
     }
 
     override fun onPostExecute(result: List<Vorlesungstag>?) {

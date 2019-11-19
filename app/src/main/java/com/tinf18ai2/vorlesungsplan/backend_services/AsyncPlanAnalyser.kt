@@ -13,14 +13,17 @@ import kotlin.collections.ArrayList
 
 class AsyncPlanAnalyser {
 
-    val URL =
-        "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
+    val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
     val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
 
     var log: Logger = Logger.getGlobal()
 
     fun analyse(): List<Vorlesungstag>? {
-        return getData()
+        return getData(0)
+    }
+
+    fun analyse(shiftWeeks: Int): List<Vorlesungstag>? {
+        return getData(shiftWeeks)
     }
 
     private fun getIcalData(): List<Vorlesungstag>?{
@@ -29,9 +32,17 @@ class AsyncPlanAnalyser {
         return week
     }
 
-    private fun getData(): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
+    private fun calculateTimeStamp(shiftWeeks: Int) : String{
+        var shiftDays = 7*shiftWeeks
+        val base = "&date="
+        val dayMillis = 24*60*60
+        var time = Date().time / 1000 + (1+shiftDays)*dayMillis
+        return base+time
+    }
+
+    private fun getData(shiftWeeks: Int): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
         val week: ArrayList<Vorlesungstag> = ArrayList()    //Holds Information about the hole week
-        val site: Document = readWebsite(URL) ?: return null  //returns null if site==null
+        val site: Document = readWebsite(URL+calculateTimeStamp(shiftWeeks)) ?: return null  //returns null if site==null
 
         val days = site.getElementsByClass("ui-grid-e").first()
             .children()//Array which holds information about every day in the week

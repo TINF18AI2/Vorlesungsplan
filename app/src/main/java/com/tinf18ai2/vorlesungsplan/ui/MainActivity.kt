@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: VorlesungsplanAdapter
     private var networkError: Boolean = false
+    private var weekShift = 0
 
     var woche: List<Vorlesungstag> = ArrayList()
 
@@ -73,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                     mainRecyclerView.adapter = adapter
                 }
             }
-        }).execute()
+        },weekShift= weekShift).execute()
 
     }
 
