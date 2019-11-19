@@ -8,13 +8,49 @@
     tools:context=".ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <Button
+        android:id="@+id/lastWeekButton"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:backgroundTint="@color/colorPrimary"
+        android:foreground="@drawable/ic_arrow_left_white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="10dp"/>
+
+    <Button
+        android:id="@+id/currentWeekButton"
+        style="@style/Widget.Design.FloatingActionButton"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:backgroundTint="@color/colorPrimary"
+        android:foreground="@drawable/ic_reset_white"
+        app:layout_constraintEnd_toEndOf="@+id/nextWeekButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="10dp"/>
+
+    <Button
+        android:id="@+id/nextWeekButton"
+        style="@style/Widget.Design.FloatingActionButton"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:backgroundTint="@color/colorPrimary"
+        android:foreground="@drawable/ic_arrow_right_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="10dp"/>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mainRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:scrollbars="vertical"
         android:visibility="invisible"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lastWeekButton" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -25,5 +61,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

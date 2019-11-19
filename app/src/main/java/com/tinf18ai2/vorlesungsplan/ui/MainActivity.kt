@@ -49,6 +49,24 @@ class MainActivity : AppCompatActivity() {
         }
         reloadViews()
 
+        lastWeekButton.setOnClickListener{
+            changeWeek(-1)
+        }
+
+        nextWeekButton.setOnClickListener{
+            changeWeek(1)
+        }
+        currentWeekButton.setOnClickListener{
+            changeWeek(0)
+        }
+    }
+
+    private fun changeWeek(value: Int){
+        if(value==0){
+            weekShift = 0
+        }
+        weekShift += value
+        reloadViews()
     }
 
     private fun reloadViews() {
