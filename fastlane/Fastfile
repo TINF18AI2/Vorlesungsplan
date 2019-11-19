@@ -44,6 +44,7 @@
    )
    supply(
          track: 'internal',
-         aab: 'app/build/outputs/bundle/release/app-release.aab'
+         aab: 'app/build/outputs/bundle/release/app-release.aab',
+         skip_upload_apk: 'true'
    )
  end
