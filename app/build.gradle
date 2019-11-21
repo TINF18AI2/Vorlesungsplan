@@ -61,12 +61,10 @@ if (keystorePropertiesFile.exists()) {
         androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
         // jsoup HTML parser library @ https://jsoup.org/
         implementation 'org.jsoup:jsoup:1.12.1'
+        implementation "org.jetbrains.kotlin:kotlin-script-runtime:1.3.60"
     }
 
 
-}
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-script-runtime:1.3.50"
 }
 
 
