@@ -71,7 +71,8 @@ class AsyncPlanAnalyser {
                                     timeString,
                                     info,
                                     times.start,
-                                    times.end
+                                    times.end,
+                                    false
                                 )
                             )
                         }
