@@ -7,5 +7,6 @@ class VorlesungsplanItem(
     val time: String, //Zeitstring (ANFANGSZEIT-ENDZEIT)
     val description: String, //Raum...
     val startTime : Date,   //Startzeit
-    val endTime : Date  //Endzeit
+    val endTime : Date,  //Endzeit
+    val isDay: Boolean
 )

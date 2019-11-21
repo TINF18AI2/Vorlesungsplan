@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.R
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
 
 class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Context) :
@@ -42,10 +43,14 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         holder.titleTextView.text = item.title
         holder.timeTextView.text = item.time
         holder.descriptionTextView.text = item.description
-        if (item.time.equals("")) {
+        LOG.info("set layout: \ntitleTextView: ${holder.titleTextView.text}\ntimeTextView:${holder.timeTextView.text}")
+        if (item.isDay) {
             holder.titleTextView.setTextSize(20.toFloat())
             holder.titleTextView.setTextColor(Color.parseColor("#820000"))
 //            holder.titleTextView.setTextColor(Color.GRAY)
+        }else{
+            holder.titleTextView.setTextSize(16.toFloat())
+            holder.titleTextView.setTextColor(Color.GRAY)
         }
     }
 }
