@@ -9,6 +9,7 @@ keyAlias=<ENTER_ALIAS_HERE>
 storeFile=<ENTER_FILE_HERE>
 ```
 
+## Branches
 Branch|Funktion
 -|-
 stable|Akutelle veröffentlichte Version der App
