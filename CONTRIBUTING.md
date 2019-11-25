@@ -12,6 +12,6 @@ storeFile=sf
 ## Branches
 Branch|Funktion
 -|-
-stable|Akutelle veröffentlichte Version der App
-master|Aktuelle Entwicklungsversion der App
-feature/xyz|Branch für die Entwicklung von Feature xyz gedacht ist
+stable|Current published version of app
+master|Current development version of app
+feature/xyz|Branch for the creation of the feature xyz (create pull request to master when finished)
