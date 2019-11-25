@@ -47,7 +47,6 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         if (item.isDay) {
             holder.titleTextView.setTextSize(20.toFloat())
             holder.titleTextView.setTextColor(Color.parseColor("#820000"))
-//            holder.titleTextView.setTextColor(Color.GRAY)
         }else{
             holder.titleTextView.setTextSize(16.toFloat())
             holder.titleTextView.setTextColor(Color.GRAY)
