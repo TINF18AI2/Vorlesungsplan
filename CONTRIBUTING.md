@@ -1,6 +1,7 @@
 ## Branches
 ### Before you start
 create a file ```key.properties``` in the root of the project directory with content
+
 ```
 storePassword=<ENTER_STORE_PASSWORD_HERE>
 keyPassword=<ENTER_PASSWORD_HERE>
