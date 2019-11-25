@@ -3,10 +3,10 @@
 create a file ```key.properties``` in the root of the project directory with content
 
 ```
-storePassword=<ENTER_STORE_PASSWORD_HERE>
-keyPassword=<ENTER_PASSWORD_HERE>
-keyAlias=<ENTER_ALIAS_HERE>
-storeFile=<ENTER_FILE_HERE>
+storePassword=pw
+keyPassword=kpw
+keyAlias=alias
+storeFile=sf
 ```
 
 ## Branches
