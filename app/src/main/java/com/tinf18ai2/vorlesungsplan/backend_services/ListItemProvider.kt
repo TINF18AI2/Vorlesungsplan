@@ -17,7 +17,8 @@ class ListItemProvider {
                         "",
                         SimpleDateFormat("dd.MM").parse("00.00"),
                         SimpleDateFormat("dd.MM").parse("00.00"),
-                        true
+                        true,
+                        0
                     )
                 )
                 for (item in day.items) {
