@@ -59,7 +59,7 @@ class AsyncPlanAnalyser {
                         } else {
                             val timeString = elem.getElementsByClass("cal-time").first().text()
                             val times = getTimes(timeString)
-                            val info: String =
+                            var info: String =
                                 if (elem.getElementsByClass("cal-res").isEmpty()) {
                                     elem.getElementsByClass("cal-text").first().text()
                                 } else {
@@ -72,7 +72,8 @@ class AsyncPlanAnalyser {
                                     info,
                                     times.start,
                                     times.end,
-                                    false
+                                    false,
+                                    0
                                 )
                             )
                         }
@@ -84,17 +85,32 @@ class AsyncPlanAnalyser {
             if (day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()) {
                 val dayString: String =
                     day.getElementsByAttributeValue("data-role", "list-divider").first().text()
-                week.add(
+                var tag =
                     Vorlesungstag(
                         dayString,
                         items,
                         isolateTime(dayString)
                     )
-                )
+                week.add(setProgresses(tag))
             }
         }
         return week
 
+    }
+    private fun setProgresses(day: Vorlesungstag): Vorlesungstag{
+        var newItems : ArrayList<VorlesungsplanItem> = ArrayList()
+        for(elem in day.items){
+
+            val progress = getProgress(elem.startTime,elem.endTime,day.tag)
+            log.info("Progress for ${day.tag} ${elem.title} is $progress")
+
+            //for testing
+            //val description = elem.description+"Progress: ${progress}"
+            val description = elem.description
+
+            newItems.add(VorlesungsplanItem(elem.title,elem.time,description,elem.startTime,elem.endTime,elem.isDay,progress))
+        }
+        return Vorlesungstag(day.tag,newItems,day.tagDate)
     }
 
     private fun readWebsite(url: String): Document? {
@@ -113,14 +129,48 @@ class AsyncPlanAnalyser {
             }
             dateString = dateString.substring(1)
         }
-        return SimpleDateFormat("dd.MM").parse(dateString.trim())
+        return SimpleDateFormat("dd.MM").parse(dateString.trim())!!
     }
 
     private fun getTimes(times: String) : Times {
-        val t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
-        val t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
+        var t1 : Date
+        var t2 : Date
+        val format = SimpleDateFormat("HH:mm")
+        try{
+            t1 = format.parse(times.substring(0,5))!!
+            t2  = format.parse(times.substring(6,11))!!
+        }catch (e: Exception){
+            t1 = format.parse("00:00")!!
+            t2 = format.parse("00:00")!!
+        }
 
         return Times(t1, t2)
+    }
+
+
+    //returns 100 if the class is done, 0 if the class is in the future and a value from 0-100 if the class is the current class.
+    // The value is the percentage of the progress of the class
+    private fun getProgress(beg: Date, endTime: Date,day: String): Int{
+        val formatter = SimpleDateFormat("dd.MM")
+        val today : Date = formatter.parse(TimeUntilUniEnd().getTodayDate())!!
+        val dayDate : Date = formatter.parse(day.substring(day.length-5,day.length))!!
+        val now = TimeUntilUniEnd().getTodayMinutes()
+        val begin = TimeUntilUniEnd().getMinutes(beg)
+        val end = TimeUntilUniEnd().getMinutes(endTime)
+
+        if(dayDate.after(today)){
+            return 0
+        }
+        if(dayDate.before(today)){
+            return 100
+        }
+        if(now<begin){
+            return 0
+        }
+        if(end<now){
+            return 100
+        }
+        return (((now-begin).toFloat()/(end-begin).toFloat())*100).toInt()
     }
 
     private class Times(val start: Date,val end: Date)
