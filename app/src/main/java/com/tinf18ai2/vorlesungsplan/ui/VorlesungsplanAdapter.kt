@@ -1,10 +1,13 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
@@ -24,11 +27,13 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         val title: TextView = view.textViewTitle
         val time: TextView = view.textViewTime
         val descriptionTextView: TextView = view.textViewDescription
+        val progessBar: ProgressBar = view.progressBar
 
         return VorlesungsPlanItemHolder(
             titleTextView = title,
             timeTextView = time,
             descriptionTextView = descriptionTextView,
+            progessBar = progessBar,
             v = view
 
         )
@@ -47,9 +52,27 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         if (item.isDay) {
             holder.titleTextView.setTextSize(20.toFloat())
             holder.titleTextView.setTextColor(Color.parseColor("#820000"))
-        }else{
+            holder.progessBar.visibility = View.INVISIBLE
+
+        } else {
             holder.titleTextView.setTextSize(16.toFloat())
             holder.titleTextView.setTextColor(Color.GRAY)
+
+            //layout progress bar
+            val progress = item.progress
+            holder.progessBar.visibility = View.VISIBLE
+            holder.progessBar.progress = progress
+            holder.progessBar.rotation = 90.toFloat()
+
+            //color progress bar
+
+            if (progress <= 20) {
+                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.RED)
+            } else if (progress >= 80) {
+                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.GREEN)
+            }else{
+                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.parseColor("#dd8f1d"))
+            }
         }
     }
 }
@@ -58,6 +81,7 @@ class VorlesungsPlanItemHolder(
     var titleTextView: TextView,
     var timeTextView: TextView,
     var descriptionTextView: TextView,
+    var progessBar: ProgressBar,
     v: View
 ) :
     RecyclerView.ViewHolder(v)
