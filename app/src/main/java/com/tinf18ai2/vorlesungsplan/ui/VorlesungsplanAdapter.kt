@@ -51,7 +51,7 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         LOG.info("set layout: \ntitleTextView: ${holder.titleTextView.text}\ntimeTextView:${holder.timeTextView.text}")
         if (item.isDay) {
             holder.titleTextView.setTextSize(20.toFloat())
-            holder.titleTextView.setTextColor(Color.parseColor("#820000"))
+            holder.titleTextView.setTextColor(context.getColor(R.color.date_title_color))
             holder.progessBar.visibility = View.INVISIBLE
 
         } else {
@@ -67,11 +67,11 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
             //color progress bar
 
             if (progress <= 20) {
-                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.RED)
+                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_long))
             } else if (progress >= 80) {
-                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.GREEN)
+                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_short))
             }else{
-                holder.progessBar.progressTintList = ColorStateList.valueOf(Color.parseColor("#dd8f1d"))
+                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_mid))
             }
         }
     }
