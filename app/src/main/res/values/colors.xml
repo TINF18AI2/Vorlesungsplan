@@ -6,6 +6,7 @@
     <color name="black">#000000</color>
     <color name="progress_long">#C80000</color>
     <color name="progress_mid">#FF5722</color>
-    <color name="progress_short">#2E7D32</color>
+    <color name="progress_short">#43A047</color>
+    <color name="progress_done">#2E7D32</color>
     <color name="date_title_color">#820000</color>
 </resources>

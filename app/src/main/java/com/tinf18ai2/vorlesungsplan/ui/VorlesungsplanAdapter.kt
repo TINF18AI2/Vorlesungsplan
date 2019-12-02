@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.opengl.Visibility
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,18 +45,18 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
     }
 
     override fun onBindViewHolder(holder: VorlesungsPlanItemHolder, position: Int) {
-        val item = items.get(position)
+        val item = items[position]
         holder.titleTextView.text = item.title
         holder.timeTextView.text = item.time
         holder.descriptionTextView.text = item.description
         LOG.info("set layout: \ntitleTextView: ${holder.titleTextView.text}\ntimeTextView:${holder.timeTextView.text}")
         if (item.isDay) {
-            holder.titleTextView.setTextSize(20.toFloat())
+            holder.titleTextView.textSize = 20.toFloat()
             holder.titleTextView.setTextColor(context.getColor(R.color.date_title_color))
             holder.progessBar.visibility = View.INVISIBLE
 
         } else {
-            holder.titleTextView.setTextSize(16.toFloat())
+            holder.titleTextView.textSize = 16.toFloat()
             holder.titleTextView.setTextColor(Color.GRAY)
 
             //layout progress bar
@@ -66,12 +67,15 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
 
             //color progress bar
 
-            if (progress <= 20) {
-                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_long))
-            } else if (progress >= 80) {
-                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_short))
-            }else{
-                holder.progessBar.progressTintList = ColorStateList.valueOf(context.getColor(R.color.progress_mid))
+            when {
+                progress <= 20 -> holder.progessBar.progressTintList =
+                    ColorStateList.valueOf(context.getColor(R.color.progress_long))
+                progress >= 80 -> holder.progessBar.progressTintList =
+                    ColorStateList.valueOf(context.getColor(R.color.progress_short))
+                progress == 100 -> holder.progessBar.progressTintList =
+                    ColorStateList.valueOf(context.getColor(R.color.progress_done))
+                else -> holder.progessBar.progressTintList =
+                    ColorStateList.valueOf(context.getColor(R.color.progress_mid))
             }
         }
     }
