@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private var weekShift = 0
 
     var woche: List<Vorlesungstag> = ArrayList()
+    var currentWeek: List<Vorlesungstag> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     networkError = false
                     woche = list
+                    if(weekShift == 0){
+                        currentWeek = list
+                    }
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
                     adapter = VorlesungsplanAdapter(
@@ -58,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             if (!networkError) {
                 EstimateTimeLeft(
-                    woche = woche,
+                    woche = currentWeek,
                     timeResultCallback = object :
                         TimeResultCallback {
                         override fun onFinished(time: UniAusErg?) {
