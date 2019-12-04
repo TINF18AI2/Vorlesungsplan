@@ -113,7 +113,7 @@ class TimeUntilUniEnd{
     private fun timeToItem(item: VorlesungsplanItem, toEnd: Boolean) : UniAusErg? {
         var erg : UniAusErg =
             UniAusErg(-1, -1,-1,"")
-        val now = getTodayMinutes()+120
+        val now = getTodayMinutes()
         val allMins =
             if(toEnd){
                 getMinutes(item.endTime) - now
