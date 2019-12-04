@@ -6,9 +6,14 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.tinf18ai2.vorlesungsplan.backend_services.*
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.R
+import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.ListItemConverter
+import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateData
+import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateSubscriber
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.EstimateTimeLeft
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeResultCallback
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.UniAusErg
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.logging.Logger
@@ -35,7 +40,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
-        StateData.addSubscriber(subscriber = object : StateSubscriber {
+        StateData.addSubscriber(subscriber = object :
+            StateSubscriber {
             override fun onDataRecieved(list: List<Vorlesungstag>?) {
                 if (list == null) {
                     makeSnackBar(getString(R.string.network_error_msg))
@@ -49,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
                     adapter = VorlesungsplanAdapter(
-                        items = ListItemProvider.getAllListItems(
+                        items = ListItemConverter.getAllListItems(
                             list
                         ),
                         context = applicationContext

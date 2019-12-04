@@ -1,4 +1,4 @@
-package com.tinf18ai2.vorlesungsplan.backend_services
+package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
 
 import android.os.AsyncTask
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
@@ -6,7 +6,8 @@ import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 class EstimateTimeLeft(val woche: List<Vorlesungstag>, val timeResultCallback: TimeResultCallback) :
     AsyncTask<Void, Void, UniAusErg?>() {
     override fun doInBackground(vararg p0: Void?): UniAusErg? {
-        return TimeUntilUniEnd().getTimeLeft(woche)
+        return TimeEstimator()
+            .getTimeLeft(woche)
     }
 
     override fun onPostExecute(result: UniAusErg?) {

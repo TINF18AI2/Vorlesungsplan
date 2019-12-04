@@ -1,6 +1,6 @@
 package com.tinf18ai2.vorlesungsplan
 
-import com.tinf18ai2.vorlesungsplan.backend_services.StateData
+import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateData
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test

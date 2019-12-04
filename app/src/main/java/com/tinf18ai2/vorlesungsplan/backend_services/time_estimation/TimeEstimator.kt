@@ -1,14 +1,13 @@
-package com.tinf18ai2.vorlesungsplan.backend_services
+package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
 
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
-import java.lang.NullPointerException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
 
-class TimeUntilUniEnd{
+class TimeEstimator{
 
     var log: Logger = Logger.getGlobal()
 
@@ -112,7 +111,12 @@ class TimeUntilUniEnd{
 
     private fun timeToItem(item: VorlesungsplanItem, toEnd: Boolean) : UniAusErg? {
         var erg : UniAusErg =
-            UniAusErg(-1, -1,-1,"")
+            UniAusErg(
+                -1,
+                -1,
+                -1,
+                ""
+            )
         val now = getTodayMinutes()
         val allMins =
             if(toEnd){
