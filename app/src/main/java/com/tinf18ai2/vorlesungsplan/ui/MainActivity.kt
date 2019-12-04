@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                     woche = woche,
                     timeResultCallback = object :
                         TimeResultCallback {
-                        override fun onFinished(time: UniAusErg) {
+                        override fun onFinished(time: UniAusErg?) {
                             showTimeLeft(time)
                         }
                     }).execute()
@@ -98,12 +98,33 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun showTimeLeft(timeWhen: UniAusErg) {
+    fun showTimeLeft(timeWhen: UniAusErg?) {
+
         val end =
-            if (timeWhen.timeLeft < 0) {
+            if (timeWhen==null) {
                 getString(R.string.no_class_msg)
             } else {
-                getString(R.string.time_left_msg, timeWhen.timeLeft, timeWhen.name)
+                if (timeWhen.hours>0){
+                    if(timeWhen.days>0){
+                        if(timeWhen.to){
+                            getString(R.string.time_left_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }else{
+                            getString(R.string.time_to_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }
+                    }else{
+                        if(timeWhen.to){
+                            getString(R.string.time_left_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }else{
+                            getString(R.string.time_to_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }
+                    }
+                }else{
+                    if(timeWhen.to){
+                        getString(R.string.time_left_msg_m,timeWhen.mins,timeWhen.name)
+                    }else{
+                        getString(R.string.time_to_msg_m,timeWhen.mins,timeWhen.name)
+                    }
+                }
             }
         makeSnackBar(end)
     }
