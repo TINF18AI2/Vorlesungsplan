@@ -2,6 +2,11 @@
     <string name="app_name">Vorlesungsplan</string>
     <string name="action_settings">Settings</string>
     <string name="network_error_msg">Es konnte keine Verbindung zum Server aufgebaut werden.</string>
-    <string name="no_class_msg">Zurzeit findet keine Vorlesung für den Kurs TINF-18 AI2 statt.</string>
-    <string name="time_left_msg">"Noch %1$d Minuten bis zum Vorlesungsende von %2$s!"</string>
+    <string name="no_class_msg">Es findet aktuell keine Vorlesung für den Kurs TINF18 AI2 statt.</string>
+    <string name="time_left_msg_m">"Noch %1$d Minuten bis zum Vorlesungsende von %2$s!"</string>
+    <string name="time_left_msg_mh">"Noch %1$d Stunden und %2$d Minuten bis zum Vorlesungsende von %3$s!"</string>
+    <string name="time_left_msg_mhd">"Noch %1$d Tage, %2$d Stunden und %3$d Minuten  bis zum Vorlesungsende von %4$s!"</string>
+    <string name="time_to_msg_m">"Noch %1$d Minuten bis zur Vorlesung %2$s!"</string>
+    <string name="time_to_msg_mh">"Noch %1$d Stunden und %2$d Minuten bis zur Vorlesung %3$s!"</string>
+    <string name="time_to_msg_mhd">"Noch %1$d Tage, %2$d Stunden und %3$d Minuten  bis zur Vorlesung %4$s!"</string>
 </resources>

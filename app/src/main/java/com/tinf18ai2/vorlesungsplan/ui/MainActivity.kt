@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private var weekShift = 0
 
     var woche: List<Vorlesungstag> = ArrayList()
+    var currentWeek: List<Vorlesungstag> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     networkError = false
                     woche = list
+                    if(weekShift == 0){
+                        currentWeek = list
+                    }
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
                     adapter = VorlesungsplanAdapter(
@@ -58,10 +62,10 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             if (!networkError) {
                 EstimateTimeLeft(
-                    woche = woche,
+                    woche = currentWeek,
                     timeResultCallback = object :
                         TimeResultCallback {
-                        override fun onFinished(time: UniAusErg) {
+                        override fun onFinished(time: UniAusErg?) {
                             showTimeLeft(time)
                         }
                     }).execute()
@@ -98,12 +102,33 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun showTimeLeft(timeWhen: UniAusErg) {
+    fun showTimeLeft(timeWhen: UniAusErg?) {
+
         val end =
-            if (timeWhen.timeLeft < 0) {
+            if (timeWhen==null) {
                 getString(R.string.no_class_msg)
             } else {
-                getString(R.string.time_left_msg, timeWhen.timeLeft, timeWhen.name)
+                if (timeWhen.hours>0){
+                    if(timeWhen.days>0){
+                        if(timeWhen.to){
+                            getString(R.string.time_left_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }else{
+                            getString(R.string.time_to_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }
+                    }else{
+                        if(timeWhen.to){
+                            getString(R.string.time_left_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }else{
+                            getString(R.string.time_to_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                        }
+                    }
+                }else{
+                    if(timeWhen.to){
+                        getString(R.string.time_left_msg_m,timeWhen.mins,timeWhen.name)
+                    }else{
+                        getString(R.string.time_to_msg_m,timeWhen.mins,timeWhen.name)
+                    }
+                }
             }
         makeSnackBar(end)
     }
