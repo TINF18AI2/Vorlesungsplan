@@ -15,6 +15,7 @@ storeFile=sf
 | `master`      | Current development version of app                                                                                                   |
 | `feature/xyz` | Branch for the creation of the feature xyz (create pull request to master when finished)                                             |
 | `dev/xyz`     | Branch for development tasks that do not change the features of the app. Examples here would be documentation updates or refactoring |
+`release/123`| Branch for the release of a specific release (update version number)
 
 ## Directories
 - The XML layout files are in the `res` dir like in a default Android project
