@@ -7,17 +7,17 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
 
-class TimeEstimator{
+class TimeEstimator {
 
     var log: Logger = Logger.getGlobal()
 
-    fun getTimeLeft(week: List<Vorlesungstag>) : UniAusErg? {
+    fun getFABData(week: List<Vorlesungstag>): UniAusErg? {
 
         var erg = vorlesungsEnde(week)
-        if (erg==null){
+        if (erg == null) {
             val today = getToday(week)
-            if(today!=null){
-                if(getCurrentClass(today)!=null){
+            if (today != null) {
+                if (getCurrentClassOfToday(today) != null) {
                     return timeToNextClass(week)
                 }
             }
@@ -25,12 +25,14 @@ class TimeEstimator{
         return erg
     }
 
-    fun getCurrentClass(today: Vorlesungstag): VorlesungsplanItem?{
+    fun getCurrentClassOfToday(today: Vorlesungstag): VorlesungsplanItem? {
         val now = getTodayMinutes()
-        for (item in today.items){
-            val beg = getMinutes(item.startTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(0,5))
+        for (item in today.items) {
+            val beg =
+                getMinutes(item.startTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(0,5))
 
-            val end = getMinutes(item.endTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(6,11))
+            val end =
+                getMinutes(item.endTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(6,11))
 
             if (now in beg..end) {
                 return item
@@ -39,7 +41,7 @@ class TimeEstimator{
         return null
     }
 
-    fun getMinutes(time: Date): Int{
+    fun getMinutes(time: Date): Int {
         var date1: Date? = time
         try {
             val hours = SimpleDateFormat("HH")
@@ -66,13 +68,13 @@ class TimeEstimator{
     }
 
     private fun timeToNextClass(week: List<Vorlesungstag>): UniAusErg? {
-        val todayDate : Date = SimpleDateFormat("dd.MM").parse(getTodayDate())
+        val todayDate: Date = SimpleDateFormat("dd.MM").parse(getTodayDate())
         var days: Int = 0
-        for (day in week){
-            if(!day.tagDate.before(todayDate)){
-                for(item in day.items){
-                    if (item.progress==0){
-                        return timeTo(item,days)
+        for (day in week) {
+            if (!day.tagDate.before(todayDate)) {
+                for (item in day.items) {
+                    if (item.progress == 0) {
+                        return timeTo(item, days)
                     }
                 }
                 days++
@@ -82,18 +84,18 @@ class TimeEstimator{
         return null
     }
 
-    private fun timeTo(item: VorlesungsplanItem, days: Int) : UniAusErg? {
-        var erg = timeToItem(item,false)
-        if(erg!=null){
-            while (erg.mins<0){
-                erg.mins+=60
+    private fun timeTo(item: VorlesungsplanItem, days: Int): UniAusErg? {
+        var erg = timeToItem(item, false)
+        if (erg != null) {
+            while (erg.mins < 0) {
+                erg.mins += 60
                 erg.hours--
             }
-            while(erg.hours<0){
-                erg.hours+=24
+            while (erg.hours < 0) {
+                erg.hours += 24
                 erg.days--
             }
-            if (days<0){
+            if (days < 0) {
                 log.info("ERROR: Days <0 !!!! in TimeUntilUniEnd timeTo function")
             }
             erg.to = false
@@ -102,15 +104,15 @@ class TimeEstimator{
     }
 
     private fun uniAus(today: Vorlesungstag): UniAusErg? {
-        val current = getCurrentClass(today)
-        if(current!=null){
-            return timeToItem(current,true)
+        val current = getCurrentClassOfToday(today)
+        if (current != null) {
+            return timeToItem(current, true)
         }
         return null
     }
 
-    private fun timeToItem(item: VorlesungsplanItem, toEnd: Boolean) : UniAusErg? {
-        var erg : UniAusErg =
+    private fun timeToItem(item: VorlesungsplanItem, toEnd: Boolean): UniAusErg? {
+        var erg: UniAusErg =
             UniAusErg(
                 -1,
                 -1,
@@ -119,24 +121,24 @@ class TimeEstimator{
             )
         val now = getTodayMinutes()
         val allMins =
-            if(toEnd){
+            if (toEnd) {
                 getMinutes(item.endTime) - now
-            }else{
-                getMinutes(item.startTime)-now
+            } else {
+                getMinutes(item.startTime) - now
             }
-        if(toEnd&&allMins<0){
+        if (toEnd && allMins < 0) {
             return null
         }
-        erg.mins = allMins%60
-        erg.hours = (allMins -erg.mins)/60
+        erg.mins = allMins % 60
+        erg.hours = (allMins - erg.mins) / 60
         erg.days = 0
         erg.name = item.title
-        log.info("Time to: "+erg)
+        log.info("Time to: " + erg)
         return erg
     }
 
     private fun vorlesungsEnde(week: List<Vorlesungstag>): UniAusErg? {
-        var todayElem : Vorlesungstag? = getToday(week)
+        var todayElem: Vorlesungstag? = getToday(week)
         try {
             return uniAus(todayElem!!)
         } catch (e: Exception) {
@@ -146,12 +148,12 @@ class TimeEstimator{
         return null
     }
 
-    private fun getToday(week: List<Vorlesungstag>) : Vorlesungstag? {
+    private fun getToday(week: List<Vorlesungstag>): Vorlesungstag? {
         val formatter = SimpleDateFormat("dd.MM")
-        var today : Vorlesungstag? = null
-        val todayDate : String = getTodayDate()
-        for(day in week){
-            if(formatter.format(day.tagDate)==todayDate){
+        var today: Vorlesungstag? = null
+        val todayDate: String = getTodayDate()
+        for (day in week) {
+            if (formatter.format(day.tagDate) == todayDate) {
                 today = day
                 break
             }
@@ -159,12 +161,18 @@ class TimeEstimator{
         return today
     }
 
-    fun getTodayDate():String{
+    fun getTodayDate(): String {
         val formatter = SimpleDateFormat("dd.MM")
         val date = Date(System.currentTimeMillis())
-        val todayDate : String = formatter.format(date)
+        val todayDate: String = formatter.format(date)
         return todayDate
     }
 }
 
-class UniAusErg(var days: Int,var hours: Int, var mins: Int, var name: String, var to: Boolean = true) //Holds information about the Current Vorlesung and the time left until end
+class UniAusErg(
+    var days: Int,
+    var hours: Int,
+    var mins: Int,
+    var name: String,
+    var to: Boolean = true
+) //Holds information about the Current Vorlesung and the time left until end

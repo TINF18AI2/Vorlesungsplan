@@ -6,7 +6,6 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.R
 import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.ListItemConverter
 import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateData
@@ -14,6 +13,7 @@ import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateS
 import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.EstimateTimeLeft
 import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeResultCallback
 import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.UniAusErg
+import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.logging.Logger
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     networkError = false
                     woche = list
-                    if(weekShift == 0){
+                    if (weekShift == 0) {
                         currentWeek = list
                     }
                     mainRecyclerView.visibility = VISIBLE
@@ -111,28 +111,50 @@ class MainActivity : AppCompatActivity() {
     fun showTimeLeft(timeWhen: UniAusErg?) {
 
         val end =
-            if (timeWhen==null) {
+            if (timeWhen == null) {
                 getString(R.string.no_class_msg)
             } else {
-                if (timeWhen.hours>0){
-                    if(timeWhen.days>0){
-                        if(timeWhen.to){
-                            getString(R.string.time_left_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
-                        }else{
-                            getString(R.string.time_to_msg_mhd,timeWhen.days,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                if (timeWhen.hours > 0) {
+                    if (timeWhen.days > 0) {
+                        if (timeWhen.to) {
+                            getString(
+                                R.string.time_left_msg_mhd,
+                                timeWhen.days,
+                                timeWhen.hours,
+                                timeWhen.mins,
+                                timeWhen.name
+                            )
+                        } else {
+                            getString(
+                                R.string.time_to_msg_mhd,
+                                timeWhen.days,
+                                timeWhen.hours,
+                                timeWhen.mins,
+                                timeWhen.name
+                            )
                         }
-                    }else{
-                        if(timeWhen.to){
-                            getString(R.string.time_left_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
-                        }else{
-                            getString(R.string.time_to_msg_mh,timeWhen.hours,timeWhen.mins,timeWhen.name)
+                    } else {
+                        if (timeWhen.to) {
+                            getString(
+                                R.string.time_left_msg_mh,
+                                timeWhen.hours,
+                                timeWhen.mins,
+                                timeWhen.name
+                            )
+                        } else {
+                            getString(
+                                R.string.time_to_msg_mh,
+                                timeWhen.hours,
+                                timeWhen.mins,
+                                timeWhen.name
+                            )
                         }
                     }
-                }else{
-                    if(timeWhen.to){
-                        getString(R.string.time_left_msg_m,timeWhen.mins,timeWhen.name)
-                    }else{
-                        getString(R.string.time_to_msg_m,timeWhen.mins,timeWhen.name)
+                } else {
+                    if (timeWhen.to) {
+                        getString(R.string.time_left_msg_m, timeWhen.mins, timeWhen.name)
+                    } else {
+                        getString(R.string.time_to_msg_m, timeWhen.mins, timeWhen.name)
                     }
                 }
             }
