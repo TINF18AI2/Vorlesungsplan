@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tinf18ai2.vorlesungsplan.R
+import com.tinf18ai2.vorlesungsplan.models.VorlesungsPlanItemHolder
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
@@ -78,14 +79,5 @@ class VorlesungsplanAdapter(val items: List<VorlesungsplanItem>, val context: Co
         }
     }
 }
-
-class VorlesungsPlanItemHolder(
-    var titleTextView: TextView,
-    var timeTextView: TextView,
-    var descriptionTextView: TextView,
-    var progessBar: ProgressBar,
-    v: View
-) :
-    RecyclerView.ViewHolder(v)
 
 
