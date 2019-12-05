@@ -1,19 +1,20 @@
-package com.tinf18ai2.vorlesungsplan.backend_services
+package com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules
 
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 
-class AsyncPlanAnalyser {
+class PlanAnalyser {
 
-    val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
+    val URL =
+        "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
     val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
 
     var log: Logger = Logger.getGlobal()
@@ -26,23 +27,24 @@ class AsyncPlanAnalyser {
         return getData(shiftWeeks)
     }
 
-    private fun getIcalData(): List<Vorlesungstag>?{
+    private fun getIcalData(): List<Vorlesungstag>? {
         val week: ArrayList<Vorlesungstag> = ArrayList()
 
         return week
     }
 
-    private fun calculateTimeStamp(shiftWeeks: Int) : String{
-        var shiftDays = 7*shiftWeeks
+    private fun calculateTimeStamp(shiftWeeks: Int): String {
+        val shiftDays = 7 * shiftWeeks
         val base = "&date="
-        val dayMillis = 24*60*60
-        var time = Date().time / 1000 + (1+shiftDays)*dayMillis
-        return base+time
+        val dayMillis = 24 * 60 * 60
+        val time = Date().time / 1000 + (1 + shiftDays) * dayMillis
+        return base + time
     }
 
     private fun getData(shiftWeeks: Int): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
         val week: ArrayList<Vorlesungstag> = ArrayList()    //Holds Information about the hole week
-        val site: Document = readWebsite(URL+calculateTimeStamp(shiftWeeks)) ?: return null  //returns null if site==null
+        val site: Document = readWebsite(URL + calculateTimeStamp(shiftWeeks))
+            ?: return null  //returns null if site==null
 
         val days = site.getElementsByClass("ui-grid-e").first()
             .children()//Array which holds information about every day in the week
@@ -72,7 +74,8 @@ class AsyncPlanAnalyser {
                                     info,
                                     times.start,
                                     times.end,
-                                    false
+                                    false,
+                                    0
                                 )
                             )
                         }
@@ -84,23 +87,49 @@ class AsyncPlanAnalyser {
             if (day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()) {
                 val dayString: String =
                     day.getElementsByAttributeValue("data-role", "list-divider").first().text()
-                week.add(
+                val tag =
                     Vorlesungstag(
                         dayString,
                         items,
                         isolateTime(dayString)
                     )
-                )
+                week.add(setProgresses(tag))
             }
         }
         return week
 
     }
 
+    private fun setProgresses(day: Vorlesungstag): Vorlesungstag {
+        val newItems: ArrayList<VorlesungsplanItem> = ArrayList()
+        for (elem in day.items) {
+
+            val progress = getProgress(elem.startTime, elem.endTime, day.tag)
+            log.info("Progress for ${day.tag} ${elem.title} is $progress")
+
+            //for testing
+            //val description = elem.description+"Progress: ${progress}"
+            val description = elem.description
+
+            newItems.add(
+                VorlesungsplanItem(
+                    elem.title,
+                    elem.time,
+                    description,
+                    elem.startTime,
+                    elem.endTime,
+                    elem.isDay,
+                    progress
+                )
+            )
+        }
+        return Vorlesungstag(day.tag, newItems, day.tagDate)
+    }
+
     private fun readWebsite(url: String): Document? {
         return try {
             Jsoup.connect(url).get()
-        }catch (e : Exception){
+        } catch (e: Exception) {
             null
         }
     }
@@ -113,15 +142,55 @@ class AsyncPlanAnalyser {
             }
             dateString = dateString.substring(1)
         }
-        return SimpleDateFormat("dd.MM").parse(dateString.trim())
+        return SimpleDateFormat("dd.MM").parse(dateString.trim())!!
     }
 
-    private fun getTimes(times: String) : Times {
-        val t1 : Date = SimpleDateFormat("HH:mm").parse(times.substring(0,5))
-        val t2 : Date = SimpleDateFormat("HH:mm").parse(times.substring(6,11))
+    private fun getTimes(times: String): Times {
+        var t1: Date
+        var t2: Date
+        val format = SimpleDateFormat("HH:mm")
+        try {
+            t1 = format.parse(times.substring(0, 5))!!
+            t2 = format.parse(times.substring(6, 11))!!
+        } catch (e: Exception) {
+            t1 = format.parse("00:00")!!
+            t2 = format.parse("00:00")!!
+        }
 
-        return Times(t1, t2)
+        return Times(
+            t1,
+            t2
+        )
     }
 
-    private class Times(val start: Date,val end: Date)
+
+    //returns 100 if the class is done, 0 if the class is in the future and a value from 0-100 if the class is the current class.
+    // The value is the percentage of the progress of the class
+    private fun getProgress(beg: Date, endTime: Date, day: String): Int {
+        val formatter = SimpleDateFormat("dd.MM")
+        val today: Date = formatter.parse(TimeEstimator().getTodayDateString())!!
+        val dayDate: Date = formatter.parse(day.substring(day.length - 5, day.length))!!
+        val now = TimeEstimator()
+            .getMinutesOfToday()
+        val begin = TimeEstimator()
+            .getMinutesOfDay(beg)
+        val end = TimeEstimator()
+            .getMinutesOfDay(endTime)
+
+        if (dayDate.after(today)) {
+            return 0
+        }
+        if (dayDate.before(today)) {
+            return 100
+        }
+        if (now < begin) {
+            return 0
+        }
+        if (end < now) {
+            return 100
+        }
+        return (((now - begin).toFloat() / (end - begin).toFloat()) * 100).toInt()
+    }
+
+    private class Times(val start: Date, val end: Date)
 }
