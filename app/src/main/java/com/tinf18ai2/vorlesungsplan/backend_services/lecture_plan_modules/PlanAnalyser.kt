@@ -1,5 +1,6 @@
-package com.tinf18ai2.vorlesungsplan.backend_services
+package com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules
 
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import org.jsoup.Jsoup
@@ -11,7 +12,7 @@ import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 
-class AsyncPlanAnalyser {
+class PlanAnalyser {
 
     val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
     val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
@@ -144,7 +145,10 @@ class AsyncPlanAnalyser {
             t2 = format.parse("00:00")!!
         }
 
-        return Times(t1, t2)
+        return Times(
+            t1,
+            t2
+        )
     }
 
 
@@ -152,11 +156,14 @@ class AsyncPlanAnalyser {
     // The value is the percentage of the progress of the class
     private fun getProgress(beg: Date, endTime: Date,day: String): Int{
         val formatter = SimpleDateFormat("dd.MM")
-        val today : Date = formatter.parse(TimeUntilUniEnd().getTodayDate())!!
+        val today : Date = formatter.parse(TimeEstimator().getTodayDate())!!
         val dayDate : Date = formatter.parse(day.substring(day.length-5,day.length))!!
-        val now = TimeUntilUniEnd().getTodayMinutes()
-        val begin = TimeUntilUniEnd().getMinutes(beg)
-        val end = TimeUntilUniEnd().getMinutes(endTime)
+        val now = TimeEstimator()
+            .getTodayMinutes()
+        val begin = TimeEstimator()
+            .getMinutes(beg)
+        val end = TimeEstimator()
+            .getMinutes(endTime)
 
         if(dayDate.after(today)){
             return 0
