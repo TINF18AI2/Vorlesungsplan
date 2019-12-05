@@ -25,7 +25,7 @@
         android:layout_width="100px"
         android:layout_height="100px"
         android:backgroundTint="@color/colorPrimary"
-        android:foreground="@drawable/ic_reset_white"
+        android:foreground="@drawable/ic_home"
         app:layout_constraintEnd_toEndOf="@+id/nextWeekButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
