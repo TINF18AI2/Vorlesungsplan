@@ -15,8 +15,8 @@ class ListItemConverter {
                         day.tag,
                         "",
                         "",
-                        SimpleDateFormat("dd.MM").parse("00.00"),
-                        SimpleDateFormat("dd.MM").parse("00.00"),
+                        SimpleDateFormat("dd.MM").parse("00.00")!!,
+                        SimpleDateFormat("dd.MM").parse("00.00")!!,
                         true,
                         0
                     )

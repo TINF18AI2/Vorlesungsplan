@@ -34,10 +34,10 @@ class PlanAnalyser {
     }
 
     private fun calculateTimeStamp(shiftWeeks: Int): String {
-        var shiftDays = 7 * shiftWeeks
+        val shiftDays = 7 * shiftWeeks
         val base = "&date="
         val dayMillis = 24 * 60 * 60
-        var time = Date().time / 1000 + (1 + shiftDays) * dayMillis
+        val time = Date().time / 1000 + (1 + shiftDays) * dayMillis
         return base + time
     }
 
@@ -61,7 +61,7 @@ class PlanAnalyser {
                         } else {
                             val timeString = elem.getElementsByClass("cal-time").first().text()
                             val times = getTimes(timeString)
-                            var info: String =
+                            val info: String =
                                 if (elem.getElementsByClass("cal-res").isEmpty()) {
                                     elem.getElementsByClass("cal-text").first().text()
                                 } else {
@@ -87,7 +87,7 @@ class PlanAnalyser {
             if (day.getElementsByAttributeValue("data-role", "list-divider").isNotEmpty()) {
                 val dayString: String =
                     day.getElementsByAttributeValue("data-role", "list-divider").first().text()
-                var tag =
+                val tag =
                     Vorlesungstag(
                         dayString,
                         items,
@@ -101,7 +101,7 @@ class PlanAnalyser {
     }
 
     private fun setProgresses(day: Vorlesungstag): Vorlesungstag {
-        var newItems: ArrayList<VorlesungsplanItem> = ArrayList()
+        val newItems: ArrayList<VorlesungsplanItem> = ArrayList()
         for (elem in day.items) {
 
             val progress = getProgress(elem.startTime, elem.endTime, day.tag)
@@ -168,14 +168,14 @@ class PlanAnalyser {
     // The value is the percentage of the progress of the class
     private fun getProgress(beg: Date, endTime: Date, day: String): Int {
         val formatter = SimpleDateFormat("dd.MM")
-        val today: Date = formatter.parse(TimeEstimator().getTodayDate())!!
+        val today: Date = formatter.parse(TimeEstimator().getTodayDateString())!!
         val dayDate: Date = formatter.parse(day.substring(day.length - 5, day.length))!!
         val now = TimeEstimator()
-            .getTodayMinutes()
+            .getMinutesOfToday()
         val begin = TimeEstimator()
-            .getMinutes(beg)
+            .getMinutesOfDay(beg)
         val end = TimeEstimator()
-            .getMinutes(endTime)
+            .getMinutesOfDay(endTime)
 
         if (dayDate.after(today)) {
             return 0

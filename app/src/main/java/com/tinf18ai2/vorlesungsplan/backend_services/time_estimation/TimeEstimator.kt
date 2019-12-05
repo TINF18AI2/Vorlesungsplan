@@ -1,5 +1,7 @@
 package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
 
+import android.annotation.SuppressLint
+import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import java.text.ParseException
@@ -11,28 +13,27 @@ class TimeEstimator {
 
     var log: Logger = Logger.getGlobal()
 
-    fun getFABData(week: List<Vorlesungstag>): UniAusErg? {
+    fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
 
-        var erg = vorlesungsEnde(week)
+        val erg = timeToEndOfCurrentClass(week)
         if (erg == null) {
             val today = getToday(week)
             if (today != null) {
-                if (getCurrentClassOfToday(today) != null) {
-                    return timeToNextClass(week)
-                }
+                log.info("Searching next class")
+                return timeToNextClass(week)
             }
         }
         return erg
     }
 
     fun getCurrentClassOfToday(today: Vorlesungstag): VorlesungsplanItem? {
-        val now = getTodayMinutes()
+        val now = getMinutesOfToday()
         for (item in today.items) {
             val beg =
-                getMinutes(item.startTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(0,5))
+                getMinutesOfDay(item.startTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(0,5))
 
             val end =
-                getMinutes(item.endTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(6,11))
+                getMinutesOfDay(item.endTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(6,11))
 
             if (now in beg..end) {
                 return item
@@ -41,8 +42,8 @@ class TimeEstimator {
         return null
     }
 
-    fun getMinutes(time: Date): Int {
-        var date1: Date? = time
+    fun getMinutesOfDay(time: Date?): Int {
+        val date1: Date = time!!
         try {
             val hours = SimpleDateFormat("HH")
             val minutes = SimpleDateFormat("mm")
@@ -57,24 +58,24 @@ class TimeEstimator {
         return 0
     }
 
-    fun getMinutes(time: String): Int {
-        return getMinutes(SimpleDateFormat("HH:mm").parse(time))
+    fun getMinutesOfDay(time: String): Int {
+        return getMinutesOfDay(SimpleDateFormat("HH:mm").parse(time))
     }
 
-    fun getTodayMinutes(): Int {
+    fun getMinutesOfToday(): Int {
         val format = SimpleDateFormat("HH:mm")
-        return getMinutes(format.format(Date(System.currentTimeMillis())))
+        return getMinutesOfDay(format.format(Date(System.currentTimeMillis())))
         //return(getMinutes("11:00"))//For testing
     }
 
-    private fun timeToNextClass(week: List<Vorlesungstag>): UniAusErg? {
-        val todayDate: Date = SimpleDateFormat("dd.MM").parse(getTodayDate())
-        var days: Int = 0
+    private fun timeToNextClass(week: List<Vorlesungstag>): FABDataModel? {
+        val todayDate: Date = SimpleDateFormat("dd.MM").parse(getTodayDateString())!!
+        var days = 0
         for (day in week) {
             if (!day.tagDate.before(todayDate)) {
                 for (item in day.items) {
                     if (item.progress == 0) {
-                        return timeTo(item, days)
+                        return timeToClass(item, days)
                     }
                 }
                 days++
@@ -84,8 +85,8 @@ class TimeEstimator {
         return null
     }
 
-    private fun timeTo(item: VorlesungsplanItem, days: Int): UniAusErg? {
-        var erg = timeToItem(item, false)
+    private fun timeToClass(item: VorlesungsplanItem, days: Int): FABDataModel? {
+        val erg = timeToClass(item, false)
         if (erg != null) {
             while (erg.mins < 0) {
                 erg.mins += 60
@@ -103,28 +104,28 @@ class TimeEstimator {
         return erg
     }
 
-    private fun uniAus(today: Vorlesungstag): UniAusErg? {
+    private fun timeToEndOfCurrentClass(today: Vorlesungstag): FABDataModel? {
         val current = getCurrentClassOfToday(today)
         if (current != null) {
-            return timeToItem(current, true)
+            return timeToClass(current, true)
         }
         return null
     }
 
-    private fun timeToItem(item: VorlesungsplanItem, toEnd: Boolean): UniAusErg? {
-        var erg: UniAusErg =
-            UniAusErg(
+    private fun timeToClass(item: VorlesungsplanItem, toEnd: Boolean): FABDataModel? {
+        val erg =
+            FABDataModel(
                 -1,
                 -1,
                 -1,
                 ""
             )
-        val now = getTodayMinutes()
+        val now = getMinutesOfToday()
         val allMins =
             if (toEnd) {
-                getMinutes(item.endTime) - now
+                getMinutesOfDay(item.endTime) - now
             } else {
-                getMinutes(item.startTime) - now
+                getMinutesOfDay(item.startTime) - now
             }
         if (toEnd && allMins < 0) {
             return null
@@ -137,10 +138,10 @@ class TimeEstimator {
         return erg
     }
 
-    private fun vorlesungsEnde(week: List<Vorlesungstag>): UniAusErg? {
-        var todayElem: Vorlesungstag? = getToday(week)
+    private fun timeToEndOfCurrentClass(week: List<Vorlesungstag>): FABDataModel? {
+        val todayElem: Vorlesungstag? = getToday(week)
         try {
-            return uniAus(todayElem!!)
+            return timeToEndOfCurrentClass(todayElem!!)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -151,7 +152,7 @@ class TimeEstimator {
     private fun getToday(week: List<Vorlesungstag>): Vorlesungstag? {
         val formatter = SimpleDateFormat("dd.MM")
         var today: Vorlesungstag? = null
-        val todayDate: String = getTodayDate()
+        val todayDate: String = getTodayDateString()
         for (day in week) {
             if (formatter.format(day.tagDate) == todayDate) {
                 today = day
@@ -161,7 +162,7 @@ class TimeEstimator {
         return today
     }
 
-    fun getTodayDate(): String {
+    fun getTodayDateString(): String {
         val formatter = SimpleDateFormat("dd.MM")
         val date = Date(System.currentTimeMillis())
         val todayDate: String = formatter.format(date)
@@ -169,10 +170,3 @@ class TimeEstimator {
     }
 }
 
-class UniAusErg(
-    var days: Int,
-    var hours: Int,
-    var mins: Int,
-    var name: String,
-    var to: Boolean = true
-) //Holds information about the Current Vorlesung and the time left until end
