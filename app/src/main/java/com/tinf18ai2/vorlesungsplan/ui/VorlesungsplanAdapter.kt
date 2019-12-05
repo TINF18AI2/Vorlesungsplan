@@ -3,16 +3,14 @@ package com.tinf18ai2.vorlesungsplan.ui
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.opengl.Visibility
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.R
+import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 import kotlinx.android.synthetic.main.main_recycler_view_item_layout.view.*
 

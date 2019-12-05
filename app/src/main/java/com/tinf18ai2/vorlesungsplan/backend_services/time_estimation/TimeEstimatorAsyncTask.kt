@@ -7,7 +7,7 @@ class EstimateTimeLeft(val woche: List<Vorlesungstag>, val timeResultCallback: T
     AsyncTask<Void, Void, UniAusErg?>() {
     override fun doInBackground(vararg p0: Void?): UniAusErg? {
         return TimeEstimator()
-            .getTimeLeft(woche)
+            .getFABData(woche)
     }
 
     override fun onPostExecute(result: UniAusErg?) {
