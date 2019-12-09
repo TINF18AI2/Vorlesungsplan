@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.recycler_view_item_layout.view.*
 /**
  * This is the ViewHolder for all Vorlesungsplantag
  */
-class VorlesungsplanItemViewHolder(
+class ViewHolderVorlesungsplanItem(
     view: View,
     var context: Context
 ) :
@@ -50,25 +50,25 @@ class VorlesungsplanItemViewHolder(
 
 }
 
-class VorlesungsplanDayAdapter(
+class RecyclerViewAdapterVorlesungsplanDay(
     val items: List<VorlesungsplanItem>,
     val context: Context
 ) :
-    RecyclerView.Adapter<VorlesungsplanItemViewHolder>() {
+    RecyclerView.Adapter<ViewHolderVorlesungsplanItem>() {
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VorlesungsplanItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderVorlesungsplanItem {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.recycler_view_item_layout, parent, false)
-        val viewHolder = VorlesungsplanItemViewHolder(view, context)
+        val viewHolder = ViewHolderVorlesungsplanItem(view, context)
         viewHolder.create()
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: VorlesungsplanItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderVorlesungsplanItem, position: Int) {
         holder.bind(items[position])
     }
 

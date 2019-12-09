@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         val LOG: Logger = Logger.getGlobal()
     }
 
-    private lateinit var adapter: VorlesungsplanWeekAdapter
+    private lateinit var adapter: RecyclerViewAdapterVorlesungsplanWeek
     private var networkError: Boolean = false
     private var weekShift = 0
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
-                    adapter = VorlesungsplanWeekAdapter(
+                    adapter = RecyclerViewAdapterVorlesungsplanWeek(
                         items = list,
                         context = applicationContext
                     )

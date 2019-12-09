@@ -14,13 +14,13 @@ import kotlinx.android.synthetic.main.recycler_view_day_layout.view.*
 /**
  * This is the ViewHolder for all Vorlesungsplan Days
  */
-class VorlesungsplanDayViewHolder(
+class ViewHolderVorlesungsplanDay(
     var view: View,
     var context: Context
 ) :
     RecyclerView.ViewHolder(view) {
 
-    private lateinit var adapter: VorlesungsplanDayAdapter
+    private lateinit var adapter: RecyclerViewAdapterVorlesungsplanDay
 
     fun create() {
         view.recyclerViewDay.layoutManager = LinearLayoutManager(context)
@@ -32,7 +32,7 @@ class VorlesungsplanDayViewHolder(
                     "tag: ${item.tag}\n")
 
         // adapter
-        adapter = VorlesungsplanDayAdapter(
+        adapter = RecyclerViewAdapterVorlesungsplanDay(
             items = item.items,
             context = context
         )
@@ -44,25 +44,25 @@ class VorlesungsplanDayViewHolder(
 
 }
 
-class VorlesungsplanWeekAdapter(
+class RecyclerViewAdapterVorlesungsplanWeek(
     val items: List<Vorlesungstag>,
     val context: Context
 ) :
-    RecyclerView.Adapter<VorlesungsplanDayViewHolder>() {
+    RecyclerView.Adapter<ViewHolderVorlesungsplanDay>() {
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VorlesungsplanDayViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderVorlesungsplanDay {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.recycler_view_day_layout, parent, false)
-        val viewHolder = VorlesungsplanDayViewHolder(view, context)
+        val viewHolder = ViewHolderVorlesungsplanDay(view, context)
         viewHolder.create()
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: VorlesungsplanDayViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolderVorlesungsplanDay, position: Int) {
         holder.bind(items[position])
     }
 
