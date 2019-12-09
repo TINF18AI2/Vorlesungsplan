@@ -6,6 +6,7 @@ import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 
 class EstimateTimeLeft(val woche: List<Vorlesungstag>, val timeResultCallback: TimeResultCallback) :
     AsyncTask<Void, Void, FABDataModel?>() {
+
     override fun doInBackground(vararg p0: Void?): FABDataModel? {
         return TimeEstimator()
             .getFABData(woche)

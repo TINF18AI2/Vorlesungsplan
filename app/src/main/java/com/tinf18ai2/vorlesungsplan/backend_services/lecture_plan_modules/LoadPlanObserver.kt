@@ -5,6 +5,7 @@ import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 
 
 object LoadPlanObserver {
+
     private var subscribers: ArrayList<StateSubscriber> = ArrayList()
     private var values: List<Vorlesungstag>? = ArrayList()
 

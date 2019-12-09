@@ -1,6 +1,5 @@
 package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
 
-import android.annotation.SuppressLint
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag

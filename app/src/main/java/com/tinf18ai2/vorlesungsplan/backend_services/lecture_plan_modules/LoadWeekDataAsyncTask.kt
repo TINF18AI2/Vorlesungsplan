@@ -5,6 +5,7 @@ import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 
 class LoadData(var weekDataCallback: WeekDataCallback, var weekShift: Int) :
     AsyncTask<Void, Void, List<Vorlesungstag>>() {
+
     override fun doInBackground(vararg p0: Void?): List<Vorlesungstag>? {
         return PlanAnalyser()
             .analyse(weekShift)

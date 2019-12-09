@@ -30,6 +30,8 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:rotation="90"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -40,18 +42,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="TextView"
+                android:text="Theoretische Informatik"
                 android:textSize="16sp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewDescription"
+                app:layout_constraintBottom_toTopOf="@+id/textViewRoom"
                 app:layout_constraintEnd_toStartOf="@+id/textViewTime"
                 app:layout_constraintStart_toEndOf="@+id/progressBar"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textViewDescription"
+                android:id="@+id/textViewRoom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
+                android:text="Raum 034B"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/textViewTime"
@@ -62,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="TextView"
+                android:text="12:30-15:30"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
