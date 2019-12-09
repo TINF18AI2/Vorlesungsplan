@@ -9,5 +9,5 @@
     <color name="progress_short">#43A047</color>
     <color name="progress_done">#2E7D32</color>
     <color name="date_title_color">#820000</color>
-    <color name="current_day_background_color">#A30202</color>
+    <color name="current_day_background_color">#E6A1A1</color>
 </resources>
