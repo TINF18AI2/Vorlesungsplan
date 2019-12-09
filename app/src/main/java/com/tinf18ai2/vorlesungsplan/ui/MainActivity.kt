@@ -77,16 +77,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lastWeekButton.setOnClickListener {
+        buttonWeekPrevious.setOnClickListener {
             changeWeek(-1)
         }
 
-        nextWeekButton.setOnClickListener {
+        buttonWeekNext.setOnClickListener {
             changeWeek(1)
         }
-        currentWeekButton.setOnClickListener {
+
+        buttonWeekCurrent.setOnClickListener {
             changeWeek(0)
         }
+
         LoadPlanObserver.reloadData(weekShift)
     }
 
