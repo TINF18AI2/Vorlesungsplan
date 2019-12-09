@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var adapter: RecyclerViewAdapterVorlesungsplanWeek
+    private lateinit var decorator: ItemDecorationVorlesungsplanWeek
+
     private var networkError: Boolean = false
     private var weekShift = 0
 
@@ -39,6 +41,11 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
+
+        // item decorator
+        decorator = ItemDecorationVorlesungsplanWeek(64)
+        mainRecyclerView.addItemDecoration(decorator)
+
         LoadPlanObserver.addSubscriber(subscriber = object :
             StateSubscriber {
             override fun onDataRecieved(list: List<Vorlesungstag>?) {
@@ -53,6 +60,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
+
+                    // adapter
                     adapter = RecyclerViewAdapterVorlesungsplanWeek(
                         items = list,
                         context = applicationContext
@@ -77,16 +86,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lastWeekButton.setOnClickListener {
+        buttonWeekPrevious.setOnClickListener {
             changeWeek(-1)
         }
 
-        nextWeekButton.setOnClickListener {
+        buttonWeekNext.setOnClickListener {
             changeWeek(1)
         }
-        currentWeekButton.setOnClickListener {
+
+        buttonWeekCurrent.setOnClickListener {
             changeWeek(0)
         }
+
         LoadPlanObserver.reloadData(weekShift)
     }
 
