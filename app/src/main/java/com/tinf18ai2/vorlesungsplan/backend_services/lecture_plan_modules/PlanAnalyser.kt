@@ -74,7 +74,6 @@ class PlanAnalyser {
                                     info,
                                     times.start,
                                     times.end,
-                                    false,
                                     0
                                 )
                             )
@@ -118,7 +117,6 @@ class PlanAnalyser {
                     description,
                     elem.startTime,
                     elem.endTime,
-                    elem.isDay,
                     progress
                 )
             )

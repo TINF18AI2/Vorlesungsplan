@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
-import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.ListItemConverter
 import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateData
 import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateSubscriber
 import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.EstimateTimeLeft
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         val LOG: Logger = Logger.getGlobal()
     }
 
-    private lateinit var adapter: VorlesungsplanDataAdapter
+    private lateinit var adapter: VorlesungsplanWeekAdapter
     private var networkError: Boolean = false
     private var weekShift = 0
 
@@ -54,10 +53,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     mainRecyclerView.visibility = VISIBLE
                     progressBar.visibility = INVISIBLE
-                    adapter = VorlesungsplanDataAdapter(
-                        items = ListItemConverter.getAllListItems(
-                            list
-                        ),
+                    adapter = VorlesungsplanWeekAdapter(
+                        items = list,
                         context = applicationContext
                     )
                     mainRecyclerView.adapter = adapter
