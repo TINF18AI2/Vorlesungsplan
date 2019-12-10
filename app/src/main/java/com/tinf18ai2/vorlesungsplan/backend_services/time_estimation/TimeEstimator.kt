@@ -3,14 +3,20 @@ package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.logging.Logger
 
-class TimeEstimator {
+object TimeEstimator {
 
-    var log: Logger = Logger.getGlobal()
+    fun estimate(week: List<Vorlesungstag>): Single<FABDataModel> {
+        return Single.just(week)
+            .observeOn(Schedulers.computation())
+            .map { getFABData(week) }
+    }
 
     fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
 
@@ -18,7 +24,7 @@ class TimeEstimator {
         if (erg == null) {
             val today = getToday(week)
             if (today != null) {
-                log.info("Searching next class")
+                LOG.info("Searching next class")
                 return timeToNextClass(week)
             }
         }
@@ -96,7 +102,7 @@ class TimeEstimator {
                 erg.days--
             }
             if (days < 0) {
-                log.info("ERROR: Days <0 !!!! in TimeUntilUniEnd timeTo function")
+                LOG.info("ERROR: Days <0 !!!! in TimeUntilUniEnd timeTo function")
             }
             erg.to = false
         }
@@ -133,7 +139,7 @@ class TimeEstimator {
         erg.hours = (allMins - erg.mins) / 60
         erg.days = 0
         erg.name = item.title
-        log.info("Time to: " + erg)
+        LOG.info("Time to: $erg")
         return erg
     }
 

@@ -47,7 +47,7 @@ class ViewHolderVorlesungsplanDay(
 }
 
 class RecyclerViewAdapterVorlesungsplanWeek(
-    val items: List<Vorlesungstag>,
+    var items: List<Vorlesungstag>,
     val context: Context
 ) :
     RecyclerView.Adapter<ViewHolderVorlesungsplanDay>() {
