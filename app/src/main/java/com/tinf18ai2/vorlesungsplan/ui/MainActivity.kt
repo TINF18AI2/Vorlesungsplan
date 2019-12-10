@@ -7,12 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
-import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.LoadPlanObserver
-import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.StateSubscriber
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.EstimateTimeLeft
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeResultCallback
+import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.PlanAnalyser
+import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.logging.Logger
@@ -30,12 +30,17 @@ class MainActivity : AppCompatActivity() {
     private var networkError: Boolean = false
     private var weekShift = 0
 
+    private lateinit var disposable: CompositeDisposable
+
     var woche: List<Vorlesungstag> = ArrayList()
     var currentWeek: List<Vorlesungstag> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        disposable = CompositeDisposable()
+
         val linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
         setSupportActionBar(toolbar)
@@ -46,43 +51,48 @@ class MainActivity : AppCompatActivity() {
         decorator = ItemDecorationVorlesungsplanWeek(64)
         mainRecyclerView.addItemDecoration(decorator)
 
-        LoadPlanObserver.addSubscriber(subscriber = object :
-            StateSubscriber {
-            override fun onDataRecieved(list: List<Vorlesungstag>?) {
-                if (list == null) {
-                    makeSnackBar(getString(R.string.network_error_msg))
-                    networkError = true
-                } else {
-                    networkError = false
-                    woche = list
-                    if (weekShift == 0) {
-                        currentWeek = list
-                    }
-                    mainRecyclerView.visibility = VISIBLE
-                    progressBar.visibility = INVISIBLE
+        // adapter
+        adapter = RecyclerViewAdapterVorlesungsplanWeek(
+            items = ArrayList(),
+            context = applicationContext
+        )
+        mainRecyclerView.adapter = adapter
 
-                    // adapter
-                    adapter = RecyclerViewAdapterVorlesungsplanWeek(
-                        items = list,
-                        context = applicationContext
-                    )
-                    mainRecyclerView.adapter = adapter
+        this.disposable.add(
+            PlanAnalyser.toObservable()
+            .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
+            .subscribe({
+                networkError = false
+                woche = it
+                if (weekShift == 0) {
+                    currentWeek = it
                 }
-            }
-        })
+                mainRecyclerView.visibility = VISIBLE
+                progressBar.visibility = INVISIBLE
+
+                adapter.items = it
+                adapter.notifyDataSetChanged()
+            }, {
+                LOG.info("onError")
+                it.printStackTrace()
+                networkError = true
+                makeSnackBar(getString(R.string.network_error_msg))
+            })
+        )
 
         fab.setOnClickListener {
             if (!networkError) {
-                EstimateTimeLeft(
-                    woche = currentWeek,
-                    timeResultCallback = object :
-                        TimeResultCallback {
-                        override fun onFinished(time: FABDataModel?) {
-                            showTimeLeft(time)
-                        }
-                    }).execute()
+                disposable.add(
+                    TimeEstimator.estimate(currentWeek)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        showTimeLeft(it)
+                    },{
+                        makeSnackBar(getString(R.string.network_error_msg))
+                    })
+                )
             } else {
-                LoadPlanObserver.reloadData(weekShift)
+                PlanAnalyser.analyse(weekShift)
             }
         }
 
@@ -98,7 +108,17 @@ class MainActivity : AppCompatActivity() {
             changeWeek(0)
         }
 
-        LoadPlanObserver.reloadData(weekShift)
+        PlanAnalyser.analyse(weekShift)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        PlanAnalyser.analyse(weekShift)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.dispose()
     }
 
     private fun changeWeek(value: Int) {
@@ -106,18 +126,10 @@ class MainActivity : AppCompatActivity() {
             weekShift = 0
         }
         weekShift += value
-        LoadPlanObserver.reloadData(weekShift)
+        PlanAnalyser.analyse(weekShift)
     }
-
-
-    override fun onResume() {
-        super.onResume()
-        LoadPlanObserver.reloadData(weekShift)
-    }
-
 
     fun showTimeLeft(timeWhen: FABDataModel?) {
-
         val end =
             if (timeWhen == null) {
                 getString(R.string.no_class_msg)

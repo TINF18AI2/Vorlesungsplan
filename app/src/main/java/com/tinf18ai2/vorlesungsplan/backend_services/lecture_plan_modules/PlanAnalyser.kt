@@ -3,6 +3,10 @@ package com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules
 import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.text.SimpleDateFormat
@@ -11,26 +15,29 @@ import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 
-class PlanAnalyser {
+object PlanAnalyser {
+
+    private val input = BehaviorSubject.create<Int>()
+    private val output = BehaviorSubject.create<List<Vorlesungstag>>()
+
+    init {
+        input.observeOn(Schedulers.io())            // Run next step in IO-Threads
+            .map { download(it) }                   // Download data
+            .observeOn(Schedulers.computation())    // Run next step in Compute-Threads
+            .map { parse(it) }                      // Parse data
+            .subscribe(output)                      // Pipe to output
+    }
 
     val URL =
         "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
     val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
 
-    var log: Logger = Logger.getGlobal()
-
-    fun analyse(): List<Vorlesungstag>? {
-        return getData(0)
+    fun toObservable(): Observable<List<Vorlesungstag>> {
+        return output
     }
 
-    fun analyse(shiftWeeks: Int): List<Vorlesungstag>? {
-        return getData(shiftWeeks)
-    }
-
-    private fun getIcalData(): List<Vorlesungstag>? {
-        val week: ArrayList<Vorlesungstag> = ArrayList()
-
-        return week
+    fun analyse(shiftWeeks: Int) {
+        input.onNext(shiftWeeks)
     }
 
     private fun calculateTimeStamp(shiftWeeks: Int): String {
@@ -41,13 +48,21 @@ class PlanAnalyser {
         return base + time
     }
 
-    private fun getData(shiftWeeks: Int): List<Vorlesungstag>? {    //reads out the Information from the Website and saves it in the returned Array
-        val week: ArrayList<Vorlesungstag> = ArrayList()    //Holds Information about the hole week
-        val site: Document = readWebsite(URL + calculateTimeStamp(shiftWeeks))
-            ?: return null  //returns null if site==null
+    /**
+     * Downloads the needed data
+     */
+    private fun download(shiftWeeks: Int): Document {
+        return readWebsite(URL + calculateTimeStamp(shiftWeeks))
+    }
 
-        val days = site.getElementsByClass("ui-grid-e").first()
-            .children()//Array which holds information about every day in the week
+    /**
+     * Parses the data given in the Document and returns a List of Vorlesungstag
+     */
+    private fun parse(site: Document): List<Vorlesungstag> {
+        // Holds Information about the hole week
+        val week: ArrayList<Vorlesungstag> = ArrayList()
+        // Array which holds information about every day in the week
+        val days = site.getElementsByClass("ui-grid-e").first().children()
 
         for (day in days) {
             val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
@@ -96,7 +111,6 @@ class PlanAnalyser {
             }
         }
         return week
-
     }
 
     private fun setProgresses(day: Vorlesungstag): Vorlesungstag {
@@ -104,10 +118,8 @@ class PlanAnalyser {
         for (elem in day.items) {
 
             val progress = getProgress(elem.startTime, elem.endTime, day.tag)
-            log.info("Progress for ${day.tag} ${elem.title} is $progress")
+            LOG.info("Progress for ${day.tag} ${elem.title} is $progress")
 
-            //for testing
-            //val description = elem.description+"Progress: ${progress}"
             val description = elem.description
 
             newItems.add(
@@ -124,12 +136,17 @@ class PlanAnalyser {
         return Vorlesungstag(day.tag, newItems, day.tagDate)
     }
 
-    private fun readWebsite(url: String): Document? {
-        return try {
-            Jsoup.connect(url).get()
-        } catch (e: Exception) {
-            null
-        }
+    /**
+     * Reads the website from the given URL.
+     *
+     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+     * @throws org.jsoup.HttpStatusException if the response is not OK and HTTP response errors are not ignored
+     * @throws org.jsoup.UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+     * @throws java.net.SocketTimeoutException if the connection times out
+     * @throws java.io.IOException on error
+     */
+    private fun readWebsite(url: String): Document {
+        return Jsoup.connect(url).get()
     }
 
     private fun isolateTime(dateStringIn: String): Date {
@@ -161,19 +178,18 @@ class PlanAnalyser {
         )
     }
 
-
-    //returns 100 if the class is done, 0 if the class is in the future and a value from 0-100 if the class is the current class.
-    // The value is the percentage of the progress of the class
+    /**
+     * Returns the progress of the class in percent.
+     *
+     * @return 100 if the class is done, 0 if the class is in the future, 1-99 current progress
+     */
     private fun getProgress(beg: Date, endTime: Date, day: String): Int {
         val formatter = SimpleDateFormat("dd.MM")
-        val today: Date = formatter.parse(TimeEstimator().getTodayDateString())!!
+        val today: Date = formatter.parse(TimeEstimator.getTodayDateString())!!
         val dayDate: Date = formatter.parse(day.substring(day.length - 5, day.length))!!
-        val now = TimeEstimator()
-            .getMinutesOfToday()
-        val begin = TimeEstimator()
-            .getMinutesOfDay(beg)
-        val end = TimeEstimator()
-            .getMinutesOfDay(endTime)
+        val now = TimeEstimator.getMinutesOfToday()
+        val begin = TimeEstimator.getMinutesOfDay(beg)
+        val end = TimeEstimator.getMinutesOfDay(endTime)
 
         if (dayDate.after(today)) {
             return 0
