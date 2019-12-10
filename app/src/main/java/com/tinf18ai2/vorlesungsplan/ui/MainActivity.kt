@@ -1,5 +1,6 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 LOG.info("onError")
                 it.printStackTrace()
                 networkError = true
-                makeSnackBar(getString(R.string.network_error_msg))
+                makeSnackBar(getString(R.string.network_error_msg), null)
             })
         )
 
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                     .subscribe({
                         showTimeLeft(it)
                     },{
-                        makeSnackBar(getString(R.string.network_error_msg))
+                        makeSnackBar(getString(R.string.network_error_msg), null)
                     })
                 )
             } else {
@@ -178,10 +179,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        makeSnackBar(end)
+        makeSnackBar(end, timeWhen)
     }
 
-    fun makeSnackBar(msg: String) {
-        Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show()
+    fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
+        var snack = Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG)
+        if (timeWhen != null) {
+            snack.setAction("SHOW") {
+                val intent = Intent(this, CountdownActivity::class.java).apply {
+                    putExtra("TIMESTAMP", timeWhen.timestamp)
+                }
+                startActivity(intent)
+            }
+        }
+        snack.show()
     }
 }
