@@ -24,8 +24,8 @@ if (keystorePropertiesFile.exists()) {
             applicationId "com.tinf18ai2.vorlesungsplan"
             minSdkVersion 23
             targetSdkVersion 29
-            versionCode 17
-            versionName "1.0.17"
+            versionCode 19
+            versionName "1.0.19"
             testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         }
 
