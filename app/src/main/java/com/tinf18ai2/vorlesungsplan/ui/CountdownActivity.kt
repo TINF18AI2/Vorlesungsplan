@@ -20,14 +20,19 @@ class CountdownActivity : AppCompatActivity() {
 
         timestamp = intent.getLongExtra("TIMESTAMP", 1)
 
-        disposable = Flowable.interval(10, TimeUnit.MILLISECONDS)
+        // Using a prime number as period for nicer visuals
+        disposable = Flowable.interval(13, TimeUnit.MILLISECONDS)
             .map { calculateTime() }
-            .takeUntil{ it <= 0 }
+            .takeUntil { it <= 0 }
             .map { toTimeLeft(it) }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribe( { // onNext
                 textViewCountdown.text = it
-            }
+            }, { // onError
+                textViewCountdown.text = toTimeLeft(0)
+            }, { // onComplete
+                textViewCountdown.text = toTimeLeft(0)
+            })
     }
 
     override fun onDestroy() {
