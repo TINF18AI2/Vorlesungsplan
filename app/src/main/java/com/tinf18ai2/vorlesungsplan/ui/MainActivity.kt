@@ -184,14 +184,16 @@ class MainActivity : AppCompatActivity() {
 
     fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
         var snack = Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG)
-        if (timeWhen != null) {
+        // if (timeWhen != null) {
             snack.setAction("SHOW") {
                 val intent = Intent(this, CountdownActivity::class.java).apply {
-                    putExtra("TIMESTAMP", timeWhen.timestamp)
+                    var timestamp = System.currentTimeMillis() % (24*60*60*1000)
+                    timestamp += 60*1000
+                    putExtra("TIMESTAMP", timestamp)
                 }
                 startActivity(intent)
             }
-        }
+        //}
         snack.show()
     }
 }

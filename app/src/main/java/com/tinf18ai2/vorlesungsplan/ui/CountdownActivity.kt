@@ -1,6 +1,8 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.tinf18ai2.vorlesungsplan.R
 import io.reactivex.Flowable
@@ -13,6 +15,7 @@ class CountdownActivity : AppCompatActivity() {
 
     private lateinit var disposable: Disposable
     private var timestamp: Long = 1
+    private var showMs: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +36,25 @@ class CountdownActivity : AppCompatActivity() {
             }, { // onComplete
                 textViewCountdown.text = toTimeLeft(0)
             })
+
+        buttonToPictureInPicture.setOnClickListener {
+            enterPictureInPictureMode()
+        }
     }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        if (isInPictureInPictureMode) {
+            showMs = false
+            buttonToPictureInPicture.visibility = View.GONE
+        } else {
+            showMs = true
+            buttonToPictureInPicture.visibility = View.VISIBLE
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -56,12 +77,19 @@ class CountdownActivity : AppCompatActivity() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(millis)
         millis -= TimeUnit.SECONDS.toMillis(seconds)
 
+        var format = when(showMs)
+        {
+            true -> "%01d:%02d:%02d.%03d"
+            false -> "%01d:%02d:%02d"
+        }
+
         return String.format(
-            "%02d:%02d:%02d.%03d",
+            format,
             hours,
             minutes,
             seconds,
             millis
         )
     }
+
 }
