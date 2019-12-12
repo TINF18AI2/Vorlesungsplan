@@ -24,8 +24,8 @@ class CountdownActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Remove status bar
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        window.setFlags(LayoutParams.FLAG_FULLSCREEN, LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(LayoutParams.FLAG_FULLSCREEN, LayoutParams.FLAG_FULLSCREEN)
         // Set Layout
         setContentView(R.layout.activity_countdown)
 
