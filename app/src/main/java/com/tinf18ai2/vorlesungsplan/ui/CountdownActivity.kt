@@ -49,9 +49,13 @@ class CountdownActivity : AppCompatActivity() {
         if (isInPictureInPictureMode) {
             showMs = false
             buttonToPictureInPicture.visibility = View.GONE
+            val timespan = Math.max(calculateTime(), 0)
+            textViewCountdown.text = toTimeLeft(timespan)
         } else {
             showMs = true
             buttonToPictureInPicture.visibility = View.VISIBLE
+            val timespan = Math.max(calculateTime(), 0)
+            textViewCountdown.text = toTimeLeft(timespan)
         }
     }
 
