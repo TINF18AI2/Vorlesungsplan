@@ -3,6 +3,9 @@ package com.tinf18ai2.vorlesungsplan.ui
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
+import android.view.WindowManager.*
 import androidx.appcompat.app.AppCompatActivity
 import com.tinf18ai2.vorlesungsplan.R
 import io.reactivex.Flowable
@@ -19,6 +22,11 @@ class CountdownActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Remove status bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        window.setFlags(LayoutParams.FLAG_FULLSCREEN, LayoutParams.FLAG_FULLSCREEN);
+        // Set Layout
         setContentView(R.layout.activity_countdown)
 
         timestamp = intent.getLongExtra("TIMESTAMP", 1)
@@ -37,6 +45,7 @@ class CountdownActivity : AppCompatActivity() {
                 textViewCountdown.text = toTimeLeft(0)
             })
 
+        // Add Listener to fullscreen button
         buttonToPictureInPicture.setOnClickListener {
             enterPictureInPictureMode()
         }
