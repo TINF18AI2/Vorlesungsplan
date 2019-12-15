@@ -3,7 +3,6 @@ package com.tinf18ai2.vorlesungsplan.services.impl
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungswoche
 import com.tinf18ai2.vorlesungsplan.services.LecturePlanService
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
-import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
@@ -25,7 +24,6 @@ class LecturePlanServiceImpl : LecturePlanService {
 
                 // If the fetched week is the current week, save the week
                 if(it.weekOffset == 0) {
-                    LOG.info("Saved current week")
                     currentWeek = it
                 }
             }

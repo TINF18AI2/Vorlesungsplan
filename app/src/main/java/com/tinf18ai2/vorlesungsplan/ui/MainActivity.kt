@@ -1,6 +1,5 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
-import android.app.Service
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -8,9 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
-import com.tinf18ai2.vorlesungsplan.services.impl.TimeEstimationServiceImpl
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
-import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -119,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         disposable.dispose()
     }
 
-    fun showTimeLeft(timeWhen: FABDataModel?) {
+    private fun showTimeLeft(timeWhen: FABDataModel?) {
         val end =
             if (timeWhen == null) {
                 getString(R.string.no_class_msg)
@@ -171,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         makeSnackBar(end)
     }
 
-    fun makeSnackBar(msg: String) {
+    private fun makeSnackBar(msg: String) {
         Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show()
     }
 }

@@ -5,11 +5,8 @@ import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungswoche
 import com.tinf18ai2.vorlesungsplan.services.LecturePlanFetchService
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
-import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.text.SimpleDateFormat
@@ -19,23 +16,9 @@ import kotlin.collections.ArrayList
 
 class LecturePlanFetchServiceImpl : LecturePlanFetchService {
 
-    private val input = BehaviorSubject.create<Int>()
-    private val output = BehaviorSubject.create<Vorlesungswoche>()
-
-    val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&uid=7431001"
-    val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
-
-    init {
-        input.observeOn(Schedulers.io())             // Run next step in IO-Threads
-            .map { download(it) }                   // Download data
-            .observeOn(Schedulers.computation())    // Run next step in Compute-Threads
-            .map { parse(it) }                      // Parse data
-            .subscribe(output)
-    }
-
-    override fun toObservable(): Observable<Vorlesungswoche> {
-        TODO("CURRENTLY BROKEN")
-        return output
+    companion object {
+        const val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&uid=7431001"
+        const val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
     }
 
     override fun fetch(weekOffset: Int): Single<Vorlesungswoche> {

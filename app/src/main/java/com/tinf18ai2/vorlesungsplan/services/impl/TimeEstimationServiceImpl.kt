@@ -22,7 +22,7 @@ class TimeEstimationServiceImpl : TimeEstimationService {
             .map { getFABData(it.days) }
     }
 
-    fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
+    private fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
         val erg = timeToEndOfCurrentClass(week)
         if (erg == null) {
             val today = getToday(week)
