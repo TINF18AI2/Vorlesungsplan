@@ -1,5 +1,6 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
+import android.app.Service
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -7,10 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
-import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.PlanAnalyser
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
+import com.tinf18ai2.vorlesungsplan.services.impl.TimeEstimationServiceImpl
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,16 +29,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var decorator: ItemDecorationVorlesungsplanWeek
 
     private var networkError: Boolean = false
-    private var weekShift = 0
 
     private lateinit var disposable: CompositeDisposable
-
-    var woche: List<Vorlesungstag> = ArrayList()
-    var currentWeek: List<Vorlesungstag> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Init Services
+        ServiceFactory.init()
 
         disposable = CompositeDisposable()
 
@@ -59,21 +59,17 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.adapter = adapter
 
         this.disposable.add(
-            PlanAnalyser.toObservable()
+            ServiceFactory.getLecturePlan()
+            .toObservable()
             .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
             .subscribe({
                 networkError = false
-                woche = it
-                if (weekShift == 0) {
-                    currentWeek = it
-                }
                 mainRecyclerView.visibility = VISIBLE
                 progressBar.visibility = INVISIBLE
 
-                adapter.items = it
+                adapter.items = it.days
                 adapter.notifyDataSetChanged()
             }, {
-                LOG.info("onError")
                 it.printStackTrace()
                 networkError = true
                 makeSnackBar(getString(R.string.network_error_msg))
@@ -83,7 +79,9 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             if (!networkError) {
                 disposable.add(
-                    TimeEstimator.estimate(currentWeek)
+                    ServiceFactory.getTimeEstimation()
+                    .estimate()
+                    // Add Retry
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         showTimeLeft(it)
@@ -92,41 +90,33 @@ class MainActivity : AppCompatActivity() {
                     })
                 )
             } else {
-                PlanAnalyser.analyse(weekShift)
+                ServiceFactory.getLecturePlan().refresh()
             }
         }
 
         buttonWeekPrevious.setOnClickListener {
-            changeWeek(-1)
+            ServiceFactory.getLecturePlan().gotoPreviousWeek()
         }
 
         buttonWeekNext.setOnClickListener {
-            changeWeek(1)
+            ServiceFactory.getLecturePlan().gotoNextWeek()
         }
 
         buttonWeekCurrent.setOnClickListener {
-            changeWeek(0)
+            ServiceFactory.getLecturePlan().gotoCurrentWeek()
         }
 
-        PlanAnalyser.analyse(weekShift)
+        ServiceFactory.getLecturePlan().refresh()
     }
 
     override fun onResume() {
         super.onResume()
-        PlanAnalyser.analyse(weekShift)
+        ServiceFactory.getLecturePlan().refresh()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         disposable.dispose()
-    }
-
-    private fun changeWeek(value: Int) {
-        if (value == 0) {
-            weekShift = 0
-        }
-        weekShift += value
-        PlanAnalyser.analyse(weekShift)
     }
 
     fun showTimeLeft(timeWhen: FABDataModel?) {

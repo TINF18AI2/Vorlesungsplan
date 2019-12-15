@@ -29,10 +29,6 @@ class ViewHolderVorlesungsplanDay(
     }
 
     fun bind(item: Vorlesungstag) {
-        LOG.info(
-            "Binding to VorlesungsplanDay:\n" +
-                    "tag: ${item.tag}\n")
-
         // adapter
         adapter = RecyclerViewAdapterVorlesungsplanDay(
             items = item.items,
