@@ -5,12 +5,12 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: gradle" time="25.306216724">
+      <testcase classname="fastlane.lanes" name="0: gradle" time="26.391386786">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: supply" time="34.761886263">
+      <testcase classname="fastlane.lanes" name="1: supply" time="38.814229045">
         
       </testcase>
     
