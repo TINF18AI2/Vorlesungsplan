@@ -5,6 +5,8 @@ package com.tinf18ai2.vorlesungsplan.models
  */
 class FABDataModel(
 
+    var timestamp: Long,
+
     var days: Int,
     var hours: Int,
     var mins: Int,

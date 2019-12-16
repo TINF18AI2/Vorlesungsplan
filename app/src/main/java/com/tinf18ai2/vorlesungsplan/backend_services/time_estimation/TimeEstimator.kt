@@ -120,6 +120,7 @@ object TimeEstimator {
     private fun timeToClass(item: VorlesungsplanItem, toEnd: Boolean): FABDataModel? {
         val erg =
             FABDataModel(
+                item.endTime.time,
                 -1,
                 -1,
                 -1,
@@ -170,8 +171,7 @@ object TimeEstimator {
     fun getTodayDateString(): String {
         val formatter = SimpleDateFormat("dd.MM")
         val date = Date(System.currentTimeMillis())
-        val todayDate: String = formatter.format(date)
-        return todayDate
+        return formatter.format(date)
     }
 }
 

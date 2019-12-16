@@ -22,7 +22,7 @@ if (keystorePropertiesFile.exists()) {
 
         defaultConfig {
             applicationId "com.tinf18ai2.vorlesungsplan"
-            minSdkVersion 23
+            minSdkVersion 24
             targetSdkVersion 29
             versionCode 19
             versionName "1.0.19"
