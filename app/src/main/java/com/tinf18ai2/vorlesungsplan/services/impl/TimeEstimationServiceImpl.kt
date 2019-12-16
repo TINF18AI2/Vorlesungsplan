@@ -111,7 +111,7 @@ class TimeEstimationServiceImpl : TimeEstimationService {
     }
 
     private fun timeToClass(item: VorlesungsplanItem, toEnd: Boolean): FABDataModel? {
-        val erg = FABDataModel(-1, -1, -1, "")
+        val erg = FABDataModel(item.endTime.time,-1, -1, -1, "")
         val now = getMinutesOfToday()
         val allMins =
             if (toEnd) {

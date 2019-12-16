@@ -1,10 +1,12 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
@@ -13,7 +15,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.util.*
 import java.util.logging.Logger
+import kotlin.collections.ArrayList
+import kotlin.math.max
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +29,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: RecyclerViewAdapterVorlesungsplanWeek
     private lateinit var decorator: ItemDecorationVorlesungsplanWeek
+
+    private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var smoothScroller: LinearSmoothScroller
 
     private var networkError: Boolean = false
 
@@ -38,8 +46,15 @@ class MainActivity : AppCompatActivity() {
 
         disposable = CompositeDisposable()
 
-        val linearLayoutManager = LinearLayoutManager(this)
+        // Layout manager and Scrolling Manager
+        linearLayoutManager = LinearLayoutManager(this)
         mainRecyclerView.layoutManager = linearLayoutManager
+        smoothScroller = object : LinearSmoothScroller(this) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
+
         setSupportActionBar(toolbar)
         mainRecyclerView.visibility = INVISIBLE
         progressBar.visibility = VISIBLE
@@ -69,11 +84,15 @@ class MainActivity : AppCompatActivity() {
             }, {
                 it.printStackTrace()
                 networkError = true
-                makeSnackBar(getString(R.string.network_error_msg))
+                makeSnackBar(getString(R.string.network_error_msg), null)
             })
         )
 
         fab.setOnClickListener {
+            // Scroll to current day
+            var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+            scrollToDay(day)
+
             if (!networkError) {
                 disposable.add(
                     ServiceFactory.getTimeEstimation()
@@ -83,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                     .subscribe({
                         showTimeLeft(it)
                     },{
-                        makeSnackBar(getString(R.string.network_error_msg))
+                        makeSnackBar(getString(R.string.network_error_msg), null)
                     })
                 )
             } else {
@@ -165,10 +184,31 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        makeSnackBar(end)
+        makeSnackBar(end, timeWhen)
     }
 
-    private fun makeSnackBar(msg: String) {
-        Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show()
+    private fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
+        var snack = Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG)
+        if (timeWhen != null) {
+            snack.setAction("SHOW") {
+                val intent = Intent(this, CountdownActivity::class.java).apply {
+                    putExtra("TIMESTAMP", timeWhen.timestamp)
+                }
+                startActivity(intent)
+            }
+        }
+        snack.show()
+    }
+    
+    fun scrollToDay(dayOfWeek: Int) {
+        // Monday = 2
+        var position = dayOfWeek - 2
+        // Sunday would be negative
+        position = max(position, 0)
+
+        // Scroll to position
+        LOG.info("Scrolling to day $dayOfWeek at $position")
+        smoothScroller.targetPosition = position
+        linearLayoutManager.startSmoothScroll(smoothScroller)
     }
 }
