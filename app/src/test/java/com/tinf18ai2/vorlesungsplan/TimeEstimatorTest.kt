@@ -1,20 +1,22 @@
 package com.tinf18ai2.vorlesungsplan
 
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
 import org.junit.Assert
 import org.junit.Test
 import java.text.SimpleDateFormat
 
 class TimeEstimatorTest {
+
+
     @Test
     fun test_estimation() {
-        val item1 = VorlesungsplanItem("Test1","09:00","Raum 0", SimpleDateFormat("HH:mm").parse("09:00")!!, SimpleDateFormat("HH:mm").parse("12:00")!!,true,0)
-        val item2 = VorlesungsplanItem("Test2","13:00","Raum 1", SimpleDateFormat("HH:mm").parse("13:00")!!, SimpleDateFormat("HH:mm").parse("16:00")!!,true,0)
-        val item3 = VorlesungsplanItem("Test1","09:00","Raum 0", SimpleDateFormat("HH:mm").parse("09:00")!!, SimpleDateFormat("HH:mm").parse("12:00")!!,true,0)
-        val item4 = VorlesungsplanItem("Test2","13:00","Raum 1", SimpleDateFormat("HH:mm").parse("13:00")!!, SimpleDateFormat("HH:mm").parse("16:00")!!,true,0)
+        val item1 = VorlesungsplanItem("Test1","09:00","Raum 0", SimpleDateFormat("HH:mm").parse("09:00")!!, SimpleDateFormat("HH:mm").parse("12:00")!!,0)
+        val item2 = VorlesungsplanItem("Test2","13:00","Raum 1", SimpleDateFormat("HH:mm").parse("13:00")!!, SimpleDateFormat("HH:mm").parse("16:00")!!,0)
+        val item3 = VorlesungsplanItem("Test1","09:00","Raum 0", SimpleDateFormat("HH:mm").parse("09:00")!!, SimpleDateFormat("HH:mm").parse("12:00")!!,0)
+        val item4 = VorlesungsplanItem("Test2","13:00","Raum 1", SimpleDateFormat("HH:mm").parse("13:00")!!, SimpleDateFormat("HH:mm").parse("16:00")!!,0)
         val items = ArrayList<VorlesungsplanItem>()
         items.add(item1)
         items.add(item2)
@@ -28,7 +30,8 @@ class TimeEstimatorTest {
         week.add(tag1)
         week.add(tag2)
 
-        val erg : FABDataModel? = TimeEstimator().getFABData(week)
+        TODO("INIT MOCK SERVICES")
+        val erg : FABDataModel? = ServiceFactory.getTimeEstimation().estimate().blockingGet()
         Assert.assertNotNull(erg)
         Assert.assertEquals(erg!!.days , 0)
     }

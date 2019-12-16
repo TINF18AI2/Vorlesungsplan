@@ -1,68 +1,59 @@
-package com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules
+package com.tinf18ai2.vorlesungsplan.services.impl
 
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
-import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
-import io.reactivex.Observable
+import com.tinf18ai2.vorlesungsplan.models.Vorlesungswoche
+import com.tinf18ai2.vorlesungsplan.services.LecturePlanFetchService
+import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 
-object PlanAnalyser {
+class LecturePlanFetchServiceImpl : LecturePlanFetchService {
 
-    private val input = BehaviorSubject.create<Int>()
-    private val output = BehaviorSubject.create<List<Vorlesungstag>>()
+    companion object {
+        const val URL = "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&uid=7431001"
+        const val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
+    }
 
-    init {
-        input.observeOn(Schedulers.io())            // Run next step in IO-Threads
+    override fun fetch(weekOffset: Int): Single<Vorlesungswoche> {
+        return Single.just(weekOffset)
+            .observeOn(Schedulers.io())             // Run next step in IO-Threads
             .map { download(it) }                   // Download data
             .observeOn(Schedulers.computation())    // Run next step in Compute-Threads
             .map { parse(it) }                      // Parse data
-            .subscribe(output)                      // Pipe to output
     }
 
-    val URL =
-        "https://vorlesungsplan.dhbw-mannheim.de/index.php?action=view&gid=3067001&uid=7431001"
-    val ICAL_URL = "http://vorlesungsplan.dhbw-mannheim.de/ical.php?uid=7431001"
-
-    fun toObservable(): Observable<List<Vorlesungstag>> {
-        return output
-    }
-
-    fun analyse(shiftWeeks: Int) {
-        input.onNext(shiftWeeks)
-    }
-
-    private fun calculateTimeStamp(shiftWeeks: Int): String {
-        val shiftDays = 7 * shiftWeeks
-        val base = "&date="
+    /**
+     * Calculate timestamp in relation to the week offset
+     */
+    private fun calculateTimeStamp(weekOffset: Int): String {
+        val shiftDays = 7 * weekOffset
         val dayMillis = 24 * 60 * 60
         val time = Date().time / 1000 + (1 + shiftDays) * dayMillis
-        return base + time
+        return "&date=$time"
     }
 
     /**
      * Downloads the needed data
      */
-    private fun download(shiftWeeks: Int): Document {
-        return readWebsite(URL + calculateTimeStamp(shiftWeeks))
+    private fun download(weekOffset: Int): AugmentedDocument {
+        return AugmentedDocument(weekOffset, readWebsite(URL + calculateTimeStamp(weekOffset)))
     }
 
     /**
      * Parses the data given in the Document and returns a List of Vorlesungstag
      */
-    private fun parse(site: Document): List<Vorlesungstag> {
+    private fun parse(augmentedDocument: AugmentedDocument): Vorlesungswoche {
         // Holds Information about the hole week
         val week: ArrayList<Vorlesungstag> = ArrayList()
         // Array which holds information about every day in the week
-        val days = site.getElementsByClass("ui-grid-e").first().children()
+        val days = augmentedDocument.document.getElementsByClass("ui-grid-e").first().children()
 
         for (day in days) {
             val items = ArrayList<VorlesungsplanItem>() //Every Vorlesung of the day
@@ -75,7 +66,10 @@ object PlanAnalyser {
                             first = false
                         } else {
                             val timeString = elem.getElementsByClass("cal-time").first().text()
-                            val times = getTimes(timeString)
+                            val times =
+                                getTimes(
+                                    timeString
+                                )
                             val info: String =
                                 if (elem.getElementsByClass("cal-res").isEmpty()) {
                                     elem.getElementsByClass("cal-text").first().text()
@@ -105,31 +99,35 @@ object PlanAnalyser {
                     Vorlesungstag(
                         dayString,
                         items,
-                        isolateTime(dayString)
+                        isolateTime(
+                            dayString
+                        )
                     )
-                week.add(setProgresses(tag))
+                week.add(
+                    setProgresses(
+                        tag
+                    )
+                )
             }
         }
-        return week
+        return Vorlesungswoche(augmentedDocument.offsetWeek, week)
     }
 
     private fun setProgresses(day: Vorlesungstag): Vorlesungstag {
         val newItems: ArrayList<VorlesungsplanItem> = ArrayList()
         for (elem in day.items) {
-
-            val progress = getProgress(elem.startTime, elem.endTime, day.tag)
-            LOG.info("Progress for ${day.tag} ${elem.title} is $progress")
-
-            val description = elem.description
-
             newItems.add(
                 VorlesungsplanItem(
                     elem.title,
                     elem.time,
-                    description,
+                    elem.description,
                     elem.startTime,
                     elem.endTime,
-                    progress
+                    getProgress(
+                        elem.startTime,
+                        elem.endTime,
+                        day.tag
+                    )
                 )
             )
         }
@@ -157,13 +155,13 @@ object PlanAnalyser {
             }
             dateString = dateString.substring(1)
         }
-        return SimpleDateFormat("dd.MM").parse(dateString.trim())!!
+        return SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(dateString.trim())!!
     }
 
     private fun getTimes(times: String): Times {
         var t1: Date
         var t2: Date
-        val format = SimpleDateFormat("HH:mm")
+        val format = SimpleDateFormat("HH:mm", ServiceFactory.getLocale().getDisplayLocale())
         try {
             t1 = format.parse(times.substring(0, 5))!!
             t2 = format.parse(times.substring(6, 11))!!
@@ -184,12 +182,14 @@ object PlanAnalyser {
      * @return 100 if the class is done, 0 if the class is in the future, 1-99 current progress
      */
     private fun getProgress(beg: Date, endTime: Date, day: String): Int {
-        val formatter = SimpleDateFormat("dd.MM")
-        val today: Date = formatter.parse(TimeEstimator.getTodayDateString())!!
+        val timeEstimation = ServiceFactory.getTimeEstimation()
+
+        val formatter = SimpleDateFormat("dd.MM", Locale.GERMANY)
+        val today: Date = formatter.parse(timeEstimation.getTodayDateString())!!
         val dayDate: Date = formatter.parse(day.substring(day.length - 5, day.length))!!
-        val now = TimeEstimator.getMinutesOfToday()
-        val begin = TimeEstimator.getMinutesOfDay(beg)
-        val end = TimeEstimator.getMinutesOfDay(endTime)
+        val now = timeEstimation.getMinutesOfToday()
+        val begin = timeEstimation.getMinutesOfDay(beg)
+        val end = timeEstimation.getMinutesOfDay(endTime)
 
         if (dayDate.after(today)) {
             return 0
@@ -206,5 +206,6 @@ object PlanAnalyser {
         return (((now - begin).toFloat() / (end - begin).toFloat()) * 100).toInt()
     }
 
+    private class AugmentedDocument(val offsetWeek: Int, val document: Document)
     private class Times(val start: Date, val end: Date)
 }

@@ -9,10 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
-import com.tinf18ai2.vorlesungsplan.backend_services.lecture_plan_modules.PlanAnalyser
-import com.tinf18ai2.vorlesungsplan.backend_services.time_estimation.TimeEstimator
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
-import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,16 +34,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var smoothScroller: LinearSmoothScroller
 
     private var networkError: Boolean = false
-    private var weekShift = 0
 
     private lateinit var disposable: CompositeDisposable
-
-    var woche: List<Vorlesungstag> = ArrayList()
-    var currentWeek: List<Vorlesungstag> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Init Services
+        ServiceFactory.init()
 
         disposable = CompositeDisposable()
 
@@ -74,21 +71,17 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.adapter = adapter
 
         this.disposable.add(
-            PlanAnalyser.toObservable()
+            ServiceFactory.getLecturePlan()
+            .toObservable()
             .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
             .subscribe({
                 networkError = false
-                woche = it
-                if (weekShift == 0) {
-                    currentWeek = it
-                }
                 mainRecyclerView.visibility = VISIBLE
                 progressBar.visibility = INVISIBLE
 
-                adapter.items = it
+                adapter.items = it.days
                 adapter.notifyDataSetChanged()
             }, {
-                LOG.info("onError")
                 it.printStackTrace()
                 networkError = true
                 makeSnackBar(getString(R.string.network_error_msg), null)
@@ -102,7 +95,9 @@ class MainActivity : AppCompatActivity() {
 
             if (!networkError) {
                 disposable.add(
-                    TimeEstimator.estimate(currentWeek)
+                    ServiceFactory.getTimeEstimation()
+                    .estimate()
+                    // Add Retry
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
                         showTimeLeft(it)
@@ -111,28 +106,28 @@ class MainActivity : AppCompatActivity() {
                     })
                 )
             } else {
-                PlanAnalyser.analyse(weekShift)
+                ServiceFactory.getLecturePlan().refresh()
             }
         }
 
         buttonWeekPrevious.setOnClickListener {
-            changeWeek(-1)
+            ServiceFactory.getLecturePlan().gotoPreviousWeek()
         }
 
         buttonWeekNext.setOnClickListener {
-            changeWeek(1)
+            ServiceFactory.getLecturePlan().gotoNextWeek()
         }
 
         buttonWeekCurrent.setOnClickListener {
-            changeWeek(0)
+            ServiceFactory.getLecturePlan().gotoCurrentWeek()
         }
 
-        PlanAnalyser.analyse(weekShift)
+        ServiceFactory.getLecturePlan().refresh()
     }
 
     override fun onResume() {
         super.onResume()
-        PlanAnalyser.analyse(weekShift)
+        ServiceFactory.getLecturePlan().refresh()
     }
 
     override fun onDestroy() {
@@ -140,15 +135,7 @@ class MainActivity : AppCompatActivity() {
         disposable.dispose()
     }
 
-    private fun changeWeek(value: Int) {
-        if (value == 0) {
-            weekShift = 0
-        }
-        weekShift += value
-        PlanAnalyser.analyse(weekShift)
-    }
-
-    fun showTimeLeft(timeWhen: FABDataModel?) {
+    private fun showTimeLeft(timeWhen: FABDataModel?) {
         val end =
             if (timeWhen == null) {
                 getString(R.string.no_class_msg)
@@ -200,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         makeSnackBar(end, timeWhen)
     }
 
-    fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
+    private fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
         var snack = Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG)
         if (timeWhen != null) {
             snack.setAction("SHOW") {
