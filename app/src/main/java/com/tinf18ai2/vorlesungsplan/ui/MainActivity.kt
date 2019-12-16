@@ -93,6 +93,9 @@ class MainActivity : AppCompatActivity() {
             var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
             scrollToDay(day)
 
+            // Set Wake-Up-Alarm
+            ServiceFactory.getWakeUpAlarm().setupAlarm(this)
+
             if (!networkError) {
                 disposable.add(
                     ServiceFactory.getTimeEstimation()
