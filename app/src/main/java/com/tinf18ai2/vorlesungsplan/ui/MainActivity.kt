@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
+import com.tinf18ai2.vorlesungsplan.ui.gestures.OnSwipeTouchListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -121,6 +122,23 @@ class MainActivity : AppCompatActivity() {
         buttonWeekCurrent.setOnClickListener {
             ServiceFactory.getLecturePlan().gotoCurrentWeek()
         }
+
+        mainRecyclerView.setOnTouchListener(
+            OnSwipeTouchListener(
+                this,
+                {
+                    ServiceFactory.getLecturePlan().gotoNextWeek()
+                },
+                {
+                    ServiceFactory.getLecturePlan().gotoPreviousWeek()
+                },
+                {
+                    // No none default behaviour
+                },
+                {
+                    // No none default behaviour
+                })
+        )
 
         ServiceFactory.getLecturePlan().refresh()
     }
