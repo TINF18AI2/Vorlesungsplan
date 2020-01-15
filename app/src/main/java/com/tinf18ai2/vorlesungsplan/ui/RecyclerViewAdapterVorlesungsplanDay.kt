@@ -23,11 +23,6 @@ class ViewHolderVorlesungsplanItem(
     fun create() { }
 
     fun bind(item: VorlesungsplanItem) {
-        LOG.info(
-            "Binding to VorlesungsplanItem:\n" +
-                    "title: ${item.title}\n" +
-                    "startTime: ${item.startTime}")
-
         // data
         itemView.textViewTitle.text = item.title
         itemView.textViewTime.text = item.time

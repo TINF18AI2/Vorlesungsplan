@@ -8,49 +8,58 @@
     tools:context=".ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/lastWeekButton"
-        style="@style/Widget.MaterialComponents.FloatingActionButton"
-        android:layout_width="100px"
-        android:layout_height="100px"
-        android:layout_margin="10dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:foreground="@drawable/ic_arrow_left_white"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/currentWeekButton"
-        style="@style/Widget.Design.FloatingActionButton"
-        android:layout_width="100px"
-        android:layout_height="100px"
-        android:layout_margin="10dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:foreground="@drawable/ic_home"
-        app:layout_constraintEnd_toEndOf="@+id/nextWeekButton"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonWeekPrevious"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:clickable="true"
+        app:fabSize="mini"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_left_white"
+        android:focusable="true" />
 
-    <Button
-        android:id="@+id/nextWeekButton"
-        style="@style/Widget.Design.FloatingActionButton"
-        android:layout_width="100px"
-        android:layout_height="100px"
-        android:layout_margin="10dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:foreground="@drawable/ic_arrow_right_white"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonWeekCurrent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:clickable="true"
+        app:fabSize="mini"
+        app:layout_constraintEnd_toStartOf="@+id/buttonWeekNext"
+        app:layout_constraintStart_toEndOf="@+id/buttonWeekPrevious"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_home"
+        android:focusable="true" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/buttonWeekNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="6dp"
+        android:clickable="true"
+        app:fabSize="mini"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_right_white"
+        android:focusable="true" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mainRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="54dp"
         android:scrollbars="vertical"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lastWeekButton" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -61,4 +70,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

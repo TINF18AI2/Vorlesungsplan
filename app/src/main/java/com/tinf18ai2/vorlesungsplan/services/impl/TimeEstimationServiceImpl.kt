@@ -1,38 +1,43 @@
-package com.tinf18ai2.vorlesungsplan.backend_services.time_estimation
+package com.tinf18ai2.vorlesungsplan.services.impl
 
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
+import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
+import com.tinf18ai2.vorlesungsplan.services.TimeEstimationService
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.logging.Logger
 
-class TimeEstimator {
+class TimeEstimationServiceImpl : TimeEstimationService {
 
-    var log: Logger = Logger.getGlobal()
+    override fun estimate(): Single<FABDataModel> {
+        return Single.just(
+                ServiceFactory.getLecturePlan().getCurrentWeek()
+            )
+            .observeOn(Schedulers.computation())
+            .map { getFABData(it.days) }
+    }
 
-    fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
-
+    private fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
         val erg = timeToEndOfCurrentClass(week)
         if (erg == null) {
             val today = getToday(week)
             if (today != null) {
-                log.info("Searching next class")
                 return timeToNextClass(week)
             }
         }
         return erg
     }
 
-    fun getCurrentClassOfToday(today: Vorlesungstag): VorlesungsplanItem? {
-        val now = getMinutesOfToday()
+    private fun getCurrentClassOfToday(today: Vorlesungstag): VorlesungsplanItem? {
+        val now =  getMinutesOfToday()
         for (item in today.items) {
-            val beg =
-                getMinutesOfDay(item.startTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(0,5))
-
-            val end =
-                getMinutesOfDay(item.endTime)//getMinutes(today.select("ul").first().children().last().select("div.cal-time").text().substring(6,11))
+            val beg = getMinutesOfDay(item.startTime)
+            val end = getMinutesOfDay(item.endTime)
 
             if (now in beg..end) {
                 return item
@@ -41,34 +46,28 @@ class TimeEstimator {
         return null
     }
 
-    fun getMinutesOfDay(time: Date?): Int {
-        val date1: Date = time!!
+    override fun getMinutesOfDay(beg: Date): Int {
         try {
-            val hours = SimpleDateFormat("HH")
-            val minutes = SimpleDateFormat("mm")
-            return Integer.parseInt(hours.format(date1)) * 60 + Integer.parseInt(
-                minutes.format(
-                    date1
-                )
-            )
+            val hours = SimpleDateFormat("HH", ServiceFactory.getLocale().getDisplayLocale())
+            val minutes = SimpleDateFormat("mm", ServiceFactory.getLocale().getDisplayLocale())
+            return Integer.parseInt(hours.format(beg)) * 60 + Integer.parseInt(minutes.format(beg))
         } catch (e: ParseException) {
             e.printStackTrace()
         }
         return 0
     }
 
-    fun getMinutesOfDay(time: String): Int {
-        return getMinutesOfDay(SimpleDateFormat("HH:mm").parse(time))
+    private fun getMinutesOfDay(time: String): Int {
+        return getMinutesOfDay(SimpleDateFormat("HH:mm", ServiceFactory.getLocale().getDisplayLocale()).parse(time)!!)
     }
 
-    fun getMinutesOfToday(): Int {
-        val format = SimpleDateFormat("HH:mm")
+    override fun getMinutesOfToday(): Int {
+        val format = SimpleDateFormat("HH:mm", ServiceFactory.getLocale().getDisplayLocale())
         return getMinutesOfDay(format.format(Date(System.currentTimeMillis())))
-        //return(getMinutes("11:00"))//For testing
     }
 
     private fun timeToNextClass(week: List<Vorlesungstag>): FABDataModel? {
-        val todayDate: Date = SimpleDateFormat("dd.MM").parse(getTodayDateString())!!
+        val todayDate: Date = SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(getTodayDateString())!!
         var days = 0
         for (day in week) {
             if (!day.tagDate.before(todayDate)) {
@@ -96,7 +95,7 @@ class TimeEstimator {
                 erg.days--
             }
             if (days < 0) {
-                log.info("ERROR: Days <0 !!!! in TimeUntilUniEnd timeTo function")
+                LOG.severe("ERROR: Days <0 !!!! in TimeUntilUniEnd timeTo function")
             }
             erg.to = false
         }
@@ -112,13 +111,7 @@ class TimeEstimator {
     }
 
     private fun timeToClass(item: VorlesungsplanItem, toEnd: Boolean): FABDataModel? {
-        val erg =
-            FABDataModel(
-                -1,
-                -1,
-                -1,
-                ""
-            )
+        val erg = FABDataModel(item.endTime.time,-1, -1, -1, "")
         val now = getMinutesOfToday()
         val allMins =
             if (toEnd) {
@@ -133,7 +126,6 @@ class TimeEstimator {
         erg.hours = (allMins - erg.mins) / 60
         erg.days = 0
         erg.name = item.title
-        log.info("Time to: " + erg)
         return erg
     }
 
@@ -144,12 +136,11 @@ class TimeEstimator {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return null
     }
 
     private fun getToday(week: List<Vorlesungstag>): Vorlesungstag? {
-        val formatter = SimpleDateFormat("dd.MM")
+        val formatter = SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale())
         var today: Vorlesungstag? = null
         val todayDate: String = getTodayDateString()
         for (day in week) {
@@ -161,11 +152,10 @@ class TimeEstimator {
         return today
     }
 
-    fun getTodayDateString(): String {
-        val formatter = SimpleDateFormat("dd.MM")
+    override fun getTodayDateString(): String {
+        val formatter = SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale())
         val date = Date(System.currentTimeMillis())
-        val todayDate: String = formatter.format(date)
-        return todayDate
+        return formatter.format(date)
     }
 }
 

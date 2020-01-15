@@ -1,6 +1,7 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
 import android.content.Context
+import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.tinf18ai2.vorlesungsplan.R
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
 import com.tinf18ai2.vorlesungsplan.ui.MainActivity.Companion.LOG
 import kotlinx.android.synthetic.main.recycler_view_day_layout.view.*
+
 
 /**
  * This is the ViewHolder for all Vorlesungsplan Days
@@ -27,10 +29,6 @@ class ViewHolderVorlesungsplanDay(
     }
 
     fun bind(item: Vorlesungstag) {
-        LOG.info(
-            "Binding to VorlesungsplanDay:\n" +
-                    "tag: ${item.tag}\n")
-
         // adapter
         adapter = RecyclerViewAdapterVorlesungsplanDay(
             items = item.items,
@@ -45,7 +43,7 @@ class ViewHolderVorlesungsplanDay(
 }
 
 class RecyclerViewAdapterVorlesungsplanWeek(
-    val items: List<Vorlesungstag>,
+    var items: List<Vorlesungstag>,
     val context: Context
 ) :
     RecyclerView.Adapter<ViewHolderVorlesungsplanDay>() {
@@ -68,6 +66,24 @@ class RecyclerViewAdapterVorlesungsplanWeek(
 
     override fun getItemViewType(position: Int): Int {
         return 0
+    }
+
+}
+
+class ItemDecorationVorlesungsplanWeek(
+    private val verticalSpaceHeight: Int
+) :
+    RecyclerView.ItemDecoration() {
+
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    )  {
+        if (parent.getChildAdapterPosition(view) != (parent.adapter!!.itemCount - 1)) {
+            outRect.bottom = verticalSpaceHeight
+        }
     }
 
 }
