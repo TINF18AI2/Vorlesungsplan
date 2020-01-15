@@ -133,18 +133,11 @@ class MainActivity : AppCompatActivity() {
         mainRecyclerView.setOnTouchListener(
             OnSwipeTouchListener(
                 this,
-                {
-                    ServiceFactory.getLecturePlan().gotoNextWeek()
-                },
-                {
-                    ServiceFactory.getLecturePlan().gotoPreviousWeek()
-                },
-                {
-                    // No none default behaviour
-                },
-                {
-                    // No none default behaviour
-                })
+                {   ServiceFactory.getLecturePlan().gotoNextWeek()
+                    true },
+                {   ServiceFactory.getLecturePlan().gotoPreviousWeek()
+                    true },
+                null, null)
         )
 
         ServiceFactory.getLecturePlan().refresh()

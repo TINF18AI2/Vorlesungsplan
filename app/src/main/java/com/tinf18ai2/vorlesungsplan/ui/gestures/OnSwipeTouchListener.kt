@@ -6,7 +6,9 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
+import com.tinf18ai2.vorlesungsplan.ui.MainActivity
 import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * A simple SwipeTouchListener for detecting left, right, top and bottom swipes.
@@ -15,10 +17,10 @@ import kotlin.math.abs
  */
 class OnSwipeTouchListener(
     context: Context,
-    val swipeLeft: () -> Unit,
-    val swipeRight: () -> Unit,
-    val swipeTop: () -> Unit,
-    val swipeBottom: () -> Unit
+    val swipeLeft: (() -> Boolean)?,
+    val swipeRight: (() -> Boolean)?,
+    val swipeTop: (() -> Boolean)?,
+    val swipeBottom: (() -> Boolean)?
 ) :
     OnTouchListener {
 
@@ -39,40 +41,47 @@ class OnSwipeTouchListener(
 
     private inner class GestureListener : SimpleOnGestureListener() {
 
-        override fun onDown(e: MotionEvent): Boolean {
+        override fun onDown(motionEvent: MotionEvent): Boolean {
             return true
         }
 
         override fun onFling(
-            e1: MotionEvent,
-            e2: MotionEvent,
+            motionEvent1: MotionEvent,
+            motionEvent2: MotionEvent,
             velocityX: Float,
             velocityY: Float
         ) : Boolean {
-            try {
-                val diffY = e2.y - e1.y
-                val diffX = e2.x - e1.x
-                if (abs(diffX) > abs(diffY)) {
-                    if (abs(diffX) > SWIPE_THRESHOLD && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0)
-                            swipeRight()
-                        else
-                            swipeLeft()
-                    }
-                } else if (abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0)
-                        swipeBottom()
-                    else
-                        swipeTop()
-                }
-                else {
+            val diffX = abs(motionEvent2.x - motionEvent1.x)
+            val diffY = abs(motionEvent2.y - motionEvent1.y)
+
+            // Horizontal motion
+            if (diffX > diffY) {
+                // Swipe long enough
+                if (diffX < SWIPE_THRESHOLD)
                     return false
-                }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-                return false
+                // Swipe fast enough
+                if (abs(velocityX) < SWIPE_VELOCITY_THRESHOLD)
+                    return false
+
+                return if (diffX > 0)
+                    swipeRight?.invoke() ?: false
+                else
+                    swipeLeft?.invoke() ?: false
             }
-            return true
+            // Vertical motion
+            else {
+                // Swipe long enough
+                if (diffY < SWIPE_THRESHOLD)
+                    return false
+                // Swipe fast enough
+                if (abs(velocityY) < SWIPE_VELOCITY_THRESHOLD)
+                    return false
+
+                return if (diffY > 0)
+                    swipeBottom?.invoke() ?: false
+                else
+                    swipeTop?.invoke() ?: false
+            }
         }
     }
 }
