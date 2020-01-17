@@ -15,9 +15,9 @@ import java.util.*
 class TimeEstimationServiceImpl : TimeEstimationService {
 
     override fun estimate(): Single<FABDataModel> {
-        return Single.just(
+        return Single.fromCallable {
                 ServiceFactory.getLecturePlan().getCurrentWeek()
-            )
+            }
             .observeOn(Schedulers.computation())
             .map { getFABData(it.days) }
     }
