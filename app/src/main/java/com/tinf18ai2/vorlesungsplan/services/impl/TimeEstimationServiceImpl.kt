@@ -1,5 +1,9 @@
 package com.tinf18ai2.vorlesungsplan.services.impl
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.tinf18ai2.vorlesungsplan.exceptions.NoLectureException
+import com.tinf18ai2.vorlesungsplan.exceptions.NoLecturePlanWeekException
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.models.VorlesungsplanItem
 import com.tinf18ai2.vorlesungsplan.models.Vorlesungstag
@@ -11,6 +15,7 @@ import io.reactivex.schedulers.Schedulers
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.logging.Level
 
 class TimeEstimationServiceImpl : TimeEstimationService {
 
@@ -18,8 +23,13 @@ class TimeEstimationServiceImpl : TimeEstimationService {
         return Single.just(
                 ServiceFactory.getLecturePlan().getCurrentWeek()
             )
+            .onErrorReturn {
+                throw NoLecturePlanWeekException("Unable to get current week from lecture plan")
+            }
             .observeOn(Schedulers.computation())
-            .map { getFABData(it.days) }
+            .map {
+                getFABData(it.days) ?: throw NoLectureException("Unable to get current or next lecture")
+            }
     }
 
     private fun getFABData(week: List<Vorlesungstag>): FABDataModel? {
