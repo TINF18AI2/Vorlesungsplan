@@ -17,7 +17,12 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:supportsPictureInPicture="true"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="sensorLandscape">
+            android:screenOrientation="sensorLandscape"
+            android:taskAffinity=".ui.CountdownActivity"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:autoRemoveFromRecents="true">
         </activity>
         <activity
             android:name=".ui.MainActivity"
