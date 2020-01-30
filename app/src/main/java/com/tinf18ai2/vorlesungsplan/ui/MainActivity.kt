@@ -20,13 +20,10 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.io.IOException
-import java.lang.IllegalStateException
-import java.lang.NullPointerException
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.collections.ArrayList
-import kotlin.math.max
 
 
 class MainActivity : AppCompatActivity() {
@@ -81,19 +78,19 @@ class MainActivity : AppCompatActivity() {
         // Observe LecturePlan changes
         this.compositeDisposable.add(
             ServiceFactory.getLecturePlan()
-            .toObservable()
-            .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
-            .subscribe({
-                mainRecyclerView.visibility = VISIBLE
-                progressBar.visibility = INVISIBLE
+                .toObservable()
+                .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
+                .subscribe({
+                    mainRecyclerView.visibility = VISIBLE
+                    progressBar.visibility = INVISIBLE
 
-                adapter.items = it.days
-                adapter.notifyDataSetChanged()
-            }, {
-                // Log and notify about the error
-                LOG.log(Level.WARNING, it) { it.message }
-                showSnackbarError(it)
-            })
+                    adapter.items = it.days
+                    adapter.notifyDataSetChanged()
+                }, {
+                    // Log and notify about the error
+                    LOG.log(Level.WARNING, it) { it.message }
+                    showSnackbarError(it)
+                })
         )
 
         fab.setOnClickListener {
@@ -104,16 +101,16 @@ class MainActivity : AppCompatActivity() {
             // Show time left
             this.compositeDisposable.add(
                 ServiceFactory.getTimeEstimation()
-                .estimate()
-                .retry(3)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    showSnackbarTime(it)
-                },{
-                    // Log and notify about the error
-                    LOG.log(Level.WARNING, it) { it.message }
-                    showSnackbarError(it)
-                })
+                    .estimate()
+                    .retry(3)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        showSnackbarTime(it)
+                    }, {
+                        // Log and notify about the error
+                        LOG.log(Level.WARNING, it) { it.message }
+                        showSnackbarError(it)
+                    })
             )
         }
 
@@ -152,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Compose message
-        val message = when(timeWhen.to) {
+        val message = when (timeWhen.to) {
             true -> getString(R.string.msg_info_lecture_end, timespan, timeWhen.name)
             else -> getString(R.string.msg_info_lecture_start, timespan, timeWhen.name)
         }
@@ -173,7 +170,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSnackbarError(throwable: Throwable) {
         // Choose message
-        val message = when(throwable) {
+        val message = when (throwable) {
             is NoLectureException -> getText(R.string.msg_error_no_lecture)
             is NoLecturePlanWeekException -> getText(R.string.msg_error_no_lecture_plan)
             is IOException -> getText(R.string.msg_error_network)
@@ -185,10 +182,15 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun scrollToDayOfWeek(dayOfWeek: Int) {
+     fun scrollToDayOfWeek(dayOfWeek: Int) {
         // Convert day of week to index
         var position = adapter.convertDayOfWeekToIndex(dayOfWeek)
 
+        // Only scroll to index, if there are enough items
+        if (position >= 0) {
+            smoothScroller.targetPosition = position
+            linearLayoutManager.startSmoothScroll(smoothScroller)
+        }
         // Only scroll to index, if there are enough items
         if (position >= 0) {
             smoothScroller.targetPosition = position
