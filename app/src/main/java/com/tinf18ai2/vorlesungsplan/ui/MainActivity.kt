@@ -15,6 +15,7 @@ import com.tinf18ai2.vorlesungsplan.exceptions.NoLectureException
 import com.tinf18ai2.vorlesungsplan.exceptions.NoLecturePlanWeekException
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
+import com.tinf18ai2.vorlesungsplan.ui.gestures.OnSwipeTouchListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
@@ -128,6 +129,16 @@ class MainActivity : AppCompatActivity() {
         buttonWeekCurrent.setOnClickListener {
             ServiceFactory.getLecturePlan().gotoCurrentWeek()
         }
+
+        mainRecyclerView.setOnTouchListener(
+            OnSwipeTouchListener(
+                this,
+                {   ServiceFactory.getLecturePlan().gotoNextWeek()
+                    true },
+                {   ServiceFactory.getLecturePlan().gotoPreviousWeek()
+                    true },
+                null, null)
+        )
 
         ServiceFactory.getLecturePlan().refresh()
     }
