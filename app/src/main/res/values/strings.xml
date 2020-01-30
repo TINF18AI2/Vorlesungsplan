@@ -1,12 +1,35 @@
 <resources>
     <string name="app_name">Vorlesungsplan</string>
     <string name="action_settings">Settings</string>
-    <string name="network_error_msg">Es konnte keine Verbindung zum Server aufgebaut werden.</string>
-    <string name="no_class_msg">Es findet aktuell keine Vorlesung für den Kurs TINF18 AI2 statt.</string>
-    <string name="time_left_msg_m">"Noch %1$d Minuten bis zum Vorlesungsende von %2$s!"</string>
-    <string name="time_left_msg_mh">"Noch %1$d Stunden und %2$d Minuten bis zum Vorlesungsende von %3$s!"</string>
-    <string name="time_left_msg_mhd">"Noch %1$d Tage, %2$d Stunden und %3$d Minuten  bis zum Vorlesungsende von %4$s!"</string>
-    <string name="time_to_msg_m">"Noch %1$d Minuten bis zur Vorlesung %2$s!"</string>
-    <string name="time_to_msg_mh">"Noch %1$d Stunden und %2$d Minuten bis zur Vorlesung %3$s!"</string>
-    <string name="time_to_msg_mhd">"Noch %1$d Tage, %2$d Stunden und %3$d Minuten  bis zur Vorlesung %4$s!"</string>
+
+
+    <string name="msg_error_network">Es konnte keine Verbindung zum Server hergestellt werden.</string>
+    <string name="msg_error_no_lecture">Es findet aktuell keine Vorlesung statt.</string>
+    <string name="msg_error_no_lecture_plan">Es steht momentan kein Vorlesungsplan zur Verfügung.</string>
+    <string name="msg_error_ambiguous">Da ist wohl etwas schief gelaufen!</string>
+
+
+    <string name="msg_info_lecture_start">In %s beginnt die Vorlesung %s!</string>
+    <string name="msg_info_lecture_end">In %s endet die Vorlesung %s!</string>
+
+
+    <string name="str_timespan_days_none"></string>
+    <string name="str_timespan_days_singular">%1$d Tag</string>
+    <string name="str_timespan_days_plural">%1$d Tagen</string>
+
+    <string name="str_timespan_hours_none"></string>
+    <string name="str_timespan_hours_singular">%1$d Stunde</string>
+    <string name="str_timespan_hours_plural">%1$d Stunden</string>
+
+    <string name="str_timespan_minutes_none"></string>
+    <string name="str_timespan_minutes_singular">%1$d Minute</string>
+    <string name="str_timespan_minutes_plural">%1$d Minuten</string>
+
+    <string name="str_timespan_seconds_none"></string>
+    <string name="str_timespan_seconds_singular">%1$d Sekunde</string>
+    <string name="str_timespan_seconds_plural">%1$d Sekunden</string>
+
+    <string name="str_timespan_none">0 Sekunden</string>
+    <string name="str_timespan_seperator">,&#160;</string>
+    <string name="str_timespan_seperator_last">&#160;und&#160;</string>
 </resources>

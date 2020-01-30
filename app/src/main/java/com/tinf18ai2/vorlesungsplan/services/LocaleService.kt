@@ -25,4 +25,11 @@ interface LocaleService {
      */
     fun getRemoteLocale(): Locale
 
+    /**
+     * Returns a human readable formatted time span String
+     * Example: 6 hours and 5 seconds
+     *
+     * @return human readable time span String
+     */
+    fun convertTimespanToString(days: Int, hours: Int, minutes: Int, seconds: Int): String
 }

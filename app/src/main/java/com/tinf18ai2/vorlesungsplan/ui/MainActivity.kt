@@ -1,21 +1,29 @@
 package com.tinf18ai2.vorlesungsplan.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.google.android.material.snackbar.Snackbar
 import com.tinf18ai2.vorlesungsplan.R
+import com.tinf18ai2.vorlesungsplan.exceptions.NoLectureException
+import com.tinf18ai2.vorlesungsplan.exceptions.NoLecturePlanWeekException
 import com.tinf18ai2.vorlesungsplan.models.FABDataModel
 import com.tinf18ai2.vorlesungsplan.services.ServiceFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.io.IOException
+import java.lang.IllegalStateException
+import java.lang.NullPointerException
 import java.util.*
+import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -33,18 +41,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var smoothScroller: LinearSmoothScroller
 
-    private var networkError: Boolean = false
+    private lateinit var compositeDisposable: CompositeDisposable
 
-    private lateinit var disposable: CompositeDisposable
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Init Services
         ServiceFactory.init()
+        ServiceFactory.getAndroid().setContext(getApplicationContext())
 
-        disposable = CompositeDisposable()
+        compositeDisposable = CompositeDisposable()
 
         // Layout manager and Scrolling Manager
         linearLayoutManager = LinearLayoutManager(this)
@@ -70,44 +78,43 @@ class MainActivity : AppCompatActivity() {
         )
         mainRecyclerView.adapter = adapter
 
-        this.disposable.add(
+        // Observe LecturePlan changes
+        this.compositeDisposable.add(
             ServiceFactory.getLecturePlan()
             .toObservable()
             .observeOn(AndroidSchedulers.mainThread()) // Observe in mainThread for UI access
             .subscribe({
-                networkError = false
                 mainRecyclerView.visibility = VISIBLE
                 progressBar.visibility = INVISIBLE
 
                 adapter.items = it.days
                 adapter.notifyDataSetChanged()
             }, {
-                it.printStackTrace()
-                networkError = true
-                makeSnackBar(getString(R.string.network_error_msg), null)
+                // Log and notify about the error
+                LOG.log(Level.WARNING, it) { it.message }
+                showSnackbarError(it)
             })
         )
 
         fab.setOnClickListener {
             // Scroll to current day
-            var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
+            val day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
             scrollToDay(day)
 
-            if (!networkError) {
-                disposable.add(
-                    ServiceFactory.getTimeEstimation()
-                    .estimate()
-                    // Add Retry
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        showTimeLeft(it)
-                    },{
-                        makeSnackBar(getString(R.string.network_error_msg), null)
-                    })
-                )
-            } else {
-                ServiceFactory.getLecturePlan().refresh()
-            }
+            // Show time left
+            this.compositeDisposable.add(
+                ServiceFactory.getTimeEstimation()
+                .estimate()
+                .retry(3)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    showSnackbarTime(it)
+                },{
+                    // Log and notify about the error
+                    LOG.log(Level.WARNING, it) { it.message }
+                    showSnackbarError(it)
+                })
+            )
         }
 
         buttonWeekPrevious.setOnClickListener {
@@ -132,73 +139,51 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        disposable.dispose()
+        compositeDisposable.dispose()
     }
 
-    private fun showTimeLeft(timeWhen: FABDataModel?) {
-        val end =
-            if (timeWhen == null) {
-                getString(R.string.no_class_msg)
-            } else {
-                if (timeWhen.hours > 0) {
-                    if (timeWhen.days > 0) {
-                        if (timeWhen.to) {
-                            getString(
-                                R.string.time_left_msg_mhd,
-                                timeWhen.days,
-                                timeWhen.hours,
-                                timeWhen.mins,
-                                timeWhen.name
-                            )
-                        } else {
-                            getString(
-                                R.string.time_to_msg_mhd,
-                                timeWhen.days,
-                                timeWhen.hours,
-                                timeWhen.mins,
-                                timeWhen.name
-                            )
-                        }
-                    } else {
-                        if (timeWhen.to) {
-                            getString(
-                                R.string.time_left_msg_mh,
-                                timeWhen.hours,
-                                timeWhen.mins,
-                                timeWhen.name
-                            )
-                        } else {
-                            getString(
-                                R.string.time_to_msg_mh,
-                                timeWhen.hours,
-                                timeWhen.mins,
-                                timeWhen.name
-                            )
-                        }
-                    }
-                } else {
-                    if (timeWhen.to) {
-                        getString(R.string.time_left_msg_m, timeWhen.mins, timeWhen.name)
-                    } else {
-                        getString(R.string.time_to_msg_m, timeWhen.mins, timeWhen.name)
-                    }
-                }
-            }
-        makeSnackBar(end, timeWhen)
-    }
+    private fun showSnackbarTime(timeWhen: FABDataModel) {
+        // Convert time span to human readable string
+        val timespan = ServiceFactory.getLocale().convertTimespanToString(
+            timeWhen.days,
+            timeWhen.hours,
+            timeWhen.mins,
+            0
+        )
 
-    private fun makeSnackBar(msg: String, timeWhen: FABDataModel?) {
-        var snack = Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG)
-        if (timeWhen != null) {
-            snack.setAction("SHOW") {
-                val intent = Intent(this, CountdownActivity::class.java).apply {
-                    putExtra("TIMESTAMP", timeWhen.timestamp)
-                }
-                startActivity(intent)
-            }
+        // Compose message
+        val message = when(timeWhen.to) {
+            true -> getString(R.string.msg_info_lecture_end, timespan, timeWhen.name)
+            else -> getString(R.string.msg_info_lecture_start, timespan, timeWhen.name)
         }
-        snack.show()
+
+        // Create new Snackbar
+        val snackbar = Snackbar.make(mainView, message, Snackbar.LENGTH_LONG)
+
+        // Add SHOW button if applicable
+        snackbar.setAction("SHOW") {
+            var intent = Intent(this, CountdownActivity::class.java)
+            intent.putExtra("TIMESTAMP", timeWhen.timestamp)
+            startActivity(intent)
+        }
+
+        // Show Snackbar
+        snackbar.show()
     }
+
+    private fun showSnackbarError(throwable: Throwable) {
+        // Choose message
+        val message = when(throwable) {
+            is NoLectureException -> getText(R.string.msg_error_no_lecture)
+            is NoLecturePlanWeekException -> getText(R.string.msg_error_no_lecture_plan)
+            is IOException -> getText(R.string.msg_error_network)
+            else -> getText(R.string.msg_error_ambiguous)
+        }
+        // Show Snackbar
+        val snackbar = Snackbar.make(mainView, message, Snackbar.LENGTH_LONG)
+        snackbar.show()
+    }
+
     
     fun scrollToDay(dayOfWeek: Int) {
         // Monday = 2
