@@ -21,14 +21,15 @@ class TimeEstimationServiceImpl : TimeEstimationService {
 
     override fun estimate(): Single<FABDataModel> {
         return Single.just(
-                ServiceFactory.getLecturePlan().getCurrentWeek()
-            )
+            ServiceFactory.getLecturePlan().getCurrentWeek()
+        )
             .onErrorReturn {
                 throw NoLecturePlanWeekException("Unable to get current week from lecture plan")
             }
             .observeOn(Schedulers.computation())
             .map {
-                getFABData(it.days) ?: throw NoLectureException("Unable to get current or next lecture")
+                getFABData(it.days)
+                    ?: throw NoLectureException("Unable to get current or next lecture")
             }
     }
 
@@ -44,7 +45,7 @@ class TimeEstimationServiceImpl : TimeEstimationService {
     }
 
     private fun getCurrentClassOfToday(today: Vorlesungstag): VorlesungsplanItem? {
-        val now =  getMinutesOfToday()
+        val now = getMinutesOfToday()
         for (item in today.items) {
             val beg = getMinutesOfDay(item.startTime)
             val end = getMinutesOfDay(item.endTime)
@@ -68,7 +69,12 @@ class TimeEstimationServiceImpl : TimeEstimationService {
     }
 
     private fun getMinutesOfDay(time: String): Int {
-        return getMinutesOfDay(SimpleDateFormat("HH:mm", ServiceFactory.getLocale().getDisplayLocale()).parse(time)!!)
+        return getMinutesOfDay(
+            SimpleDateFormat(
+                "HH:mm",
+                ServiceFactory.getLocale().getDisplayLocale()
+            ).parse(time)!!
+        )
     }
 
     override fun getMinutesOfToday(): Int {
@@ -77,7 +83,10 @@ class TimeEstimationServiceImpl : TimeEstimationService {
     }
 
     private fun timeToNextClass(week: List<Vorlesungstag>): FABDataModel? {
-        val todayDate: Date = SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(getTodayDateString())!!
+        val todayDate: Date =
+            SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(
+                getTodayDateString()
+            )!!
         var days = 0
         for (day in week) {
             if (!day.tagDate.before(todayDate)) {
@@ -121,7 +130,7 @@ class TimeEstimationServiceImpl : TimeEstimationService {
     }
 
     private fun timeToClass(item: VorlesungsplanItem, toEnd: Boolean): FABDataModel? {
-        val erg = FABDataModel(item.endTime.time,-1, -1, -1, "")
+        val erg = FABDataModel(item.endTime.time, -1, -1, -1, "")
         val now = getMinutesOfToday()
         val allMins =
             if (toEnd) {

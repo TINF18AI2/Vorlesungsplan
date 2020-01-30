@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             // Scroll to current day
             val day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
-            scrollToDay(day)
+            scrollToDayOfWeek(day)
 
             // Show time left
             this.compositeDisposable.add(
@@ -184,16 +184,15 @@ class MainActivity : AppCompatActivity() {
         snackbar.show()
     }
 
-    
-    fun scrollToDay(dayOfWeek: Int) {
-        // Monday = 2
-        var position = dayOfWeek - 2
-        // Sunday would be negative
-        position = max(position, 0)
 
-        // Scroll to position
-        LOG.info("Scrolling to day $dayOfWeek at $position")
-        smoothScroller.targetPosition = position
-        linearLayoutManager.startSmoothScroll(smoothScroller)
+    fun scrollToDayOfWeek(dayOfWeek: Int) {
+        // Convert day of week to index
+        var position = adapter.convertDayOfWeekToIndex(dayOfWeek)
+
+        // Only scroll to index, if there are enough items
+        if (position >= 0) {
+            smoothScroller.targetPosition = position
+            linearLayoutManager.startSmoothScroll(smoothScroller)
+        }
     }
 }
