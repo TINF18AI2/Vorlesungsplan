@@ -70,17 +70,17 @@ class LecturePlanFetchServiceImpl : LecturePlanFetchService {
                                 getTimes(
                                     timeString
                                 )
-                            val info: String =
+                            val info: String? =
                                 if (elem.getElementsByClass("cal-res").isEmpty()) {
-                                    elem.getElementsByClass("cal-text").first().text()
+                                    elem.getElementsByClass("cal-text")?.first()?.text()
                                 } else {
-                                    elem.getElementsByClass("cal-res").first().text()
+                                    elem.getElementsByClass("cal-res")?.first()?.text()
                                 }
                             items.add(
                                 VorlesungsplanItem(
                                     elem.getElementsByClass("cal-title").first().text(),
                                     timeString,
-                                    info,
+                                    info.orEmpty(),
                                     times.start,
                                     times.end,
                                     0
@@ -155,7 +155,9 @@ class LecturePlanFetchServiceImpl : LecturePlanFetchService {
             }
             dateString = dateString.substring(1)
         }
-        return SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(dateString.trim())!!
+        return SimpleDateFormat("dd.MM", ServiceFactory.getLocale().getDisplayLocale()).parse(
+            dateString.trim()
+        )!!
     }
 
     private fun getTimes(times: String): Times {
